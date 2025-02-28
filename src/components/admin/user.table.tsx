@@ -41,23 +41,37 @@ const UserTable = (props: IProps) => {
   const [dataUpdate, setDataUpdate] = useState<any>(null);
 
   const [userRoles, setUserRoles] = useState<{ [key: string]: number }>({});
+  const [rolesMap, setRolesMap] = useState<{ [key: number]: string }>({}); // Map từ role_id sang description
 
   // roles
   const [menuItems, setMenuItems] = useState<MenuProps["items"]>([]);
 
+  // useEffect(() => {
+  //   handleGetRoles().then(setMenuItems);
+  // }, []);
+
+  // Lấy danh sách roles từ API
   useEffect(() => {
-    handleGetRoles().then(setMenuItems);
+    const fetchRoles = async () => {
+      const items = await handleGetRoles();
+      setMenuItems(items);
+
+      // Tạo map từ role_id sang description
+      const roleMap = items.reduce(
+        (acc: { [key: number]: string }, item: any) => {
+          acc[Number(item.key)] = item.label;
+          return acc;
+        },
+        {}
+      );
+      setRolesMap(roleMap);
+    };
+    fetchRoles();
   }, []);
 
-  console.log(">>>menuItems: ", menuItems);
-
-  // const handleMenuClick = async (userId: string, role: string) => {
-  //   setUserRoles((prev) => ({
-  //     ...prev,
-  //     [userId]: role, // Cập nhật vai trò cho user tương ứng
-  //   }));
-
+  // console.log(">>>menuItems: ", menuItems);
   const handleMenuClick = async (userId: string, role_id: number) => {
+    console.log(">>>userId: ", userId, " - ", "role_id: ", role_id);
     setUserRoles((prev) => ({
       ...prev,
       [userId]: role_id, // Cập nhật vai trò cho user tương ứng
@@ -69,8 +83,13 @@ const UserTable = (props: IProps) => {
     });
 
     if (res?.data) {
+      const currentRoleId = res?.data?.role_id;
+      // Lấy description từ rolesMap
+      const currentRole = rolesMap[currentRoleId] || "";
       // console.log('>>>res: ', res);
-      message.success(`Update role for ${res?.data?.email} success`);
+      message.success(
+        `Update role ${currentRole} for ${res?.data?.email} success`
+      );
     } else {
       message.error("Error while update role");
     }
@@ -120,20 +139,26 @@ const UserTable = (props: IProps) => {
     {
       title: "Role",
       render: (text: any, record: any) => {
-        // const currentRole = userRoles[record.id] || record.role;
-        const currentRole = userRoles[record.id] || record.role;
+        // Lấy role_id từ userRoles hoặc record.role_id
+        const currentRoleId = userRoles[record.id] || record.role_id;
+        // Lấy description từ rolesMap
+        const currentRole = rolesMap[currentRoleId] || "";
         return (
           <Dropdown
             menu={{
               // Kiểm tra menuItems và item để tránh undefined/null
-              items: menuItems?.map((item) =>
-                item // Nếu item không null/undefined thì mới xử lý
-                  ? {
-                      ...item,
-                      onClick: () => handleMenuClick(record.id, Number(item.key)),
-                    }
-                  : null // Trả về null nếu item là null
-              )?.filter(Boolean) as MenuItemType[], // Lọc bỏ các giá trị null và ép kiểu
+              items: menuItems
+                ?.map(
+                  (item) =>
+                    item // Nếu item không null/undefined thì mới xử lý
+                      ? {
+                          ...item,
+                          onClick: () =>
+                            handleMenuClick(record.id, Number(item.key)),
+                        }
+                      : null // Trả về null nếu item là null
+                )
+                ?.filter(Boolean) as MenuItemType[], // Lọc bỏ các giá trị null và ép kiểu
             }}
             trigger={["click"]}
           >

@@ -21,7 +21,7 @@ const UserUpdate = (props: IProps) => {
         dataUpdate, setDataUpdate
     } = props;
 
-    console.log('>>>dataUpdate: ', dataUpdate);
+    // console.log('>>>dataUpdate: ', dataUpdate);
 
     const [form] = Form.useForm();
 
@@ -29,7 +29,7 @@ const UserUpdate = (props: IProps) => {
         if (dataUpdate) {
             //code
             form.setFieldsValue({
-                name: dataUpdate.name,
+                name: dataUpdate.username,
                 email: dataUpdate.email,
                 phone: dataUpdate.phone,
                 address: dataUpdate.address
@@ -47,7 +47,7 @@ const UserUpdate = (props: IProps) => {
         if (dataUpdate) {
             const { name, phone, address } = values;
             const res = await handleUpdateUserAction({
-                id: dataUpdate.id, name, phone, address
+                id: dataUpdate.id, username: name, phone, address
             })
             if (res?.data) {
                 handleCloseUpdateModal();

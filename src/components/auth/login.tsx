@@ -5,7 +5,7 @@ import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { authenticate } from "@/utils/action";
 import ModalReactive from "./modal.reactive";
 import ModalChangePassword from "./modal.change.pasword";
@@ -39,6 +39,7 @@ const Login = () => {
         } else {
           // redirect to dashboard
           router.push("/dashboard");
+          // console.log('>>>res: ', session);
         }
       };
 

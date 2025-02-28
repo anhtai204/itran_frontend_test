@@ -25,6 +25,7 @@ const UserCreate = (props: IProps) => {
     }
 
     const onFinish = async (values: any) => {
+        console.log('>>>values: ', values);
         const res = await handleCreateUserAction(values);
         if (res?.data) {
             handleCloseCreateModal();
@@ -74,7 +75,7 @@ const UserCreate = (props: IProps) => {
                     <Col span={24} >
                         <Form.Item
                             label="Name"
-                            name="name"
+                            name="username"
                             rules={[{ required: true, message: 'Please input your name!' }]}
                         >
                             <Input />
