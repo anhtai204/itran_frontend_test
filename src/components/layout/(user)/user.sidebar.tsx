@@ -57,43 +57,43 @@ const UserSideBar = () => {
           icon: <ProfileOutlined />,
         },
         {
-          key: "courses",
+          key: "enroll_course",
           label: <Link href={"/user/enrolled_courses"}>Các khóa học đã đăng ký</Link>,
           icon: <BookOutlined />,
         },
         {
           key: "messages",
-          label: "Tin nhắn",
+          label: <Link href={"/user/messages"}>Tin nhắn</Link>,
           icon: <MessageOutlined />,
         },
         {
           key: "wishlist",
-          label: "Danh sách mong muốn",
+          label: <Link href={"/user/wishlist"}>Danh sách mong muốn</Link>,
           icon: <StarOutlined />,
         },
         {
           key: "quizzes",
-          label: "Bài kiểm tra đã đăng ký",
+          label: <Link href={"/user/quizzes"}>Bài kiểm tra đã đăng ký</Link>,
           icon: <FileDoneOutlined />,
         },
         {
-          key: "enroll_course",
-          label: "Danh sách đăng ký khóa học",
+          key: "courses",
+          label: <Link href={"/user/courses"}>Danh sách đăng ký khóa học</Link>,
           icon: <FormOutlined />,
         },
         {
           key: "groups",
-          label: "Nhóm",
+          label: <Link href={"/user/groups"}>Nhóm</Link>,
           icon: <UsergroupDeleteOutlined />,
         },
         {
           key: "assignments",
-          label: "Bài tập",
+          label: <Link href={"/user/assignments"}>Bài tập</Link>,
           icon: <SignatureOutlined />,
         },
         {
           key: "points",
-          label: "Lịch sử điểm",
+          label: <Link href={"/user/points"}>Lịch sử điểm</Link>,
           icon: <TrophyOutlined />,
         },
         {
