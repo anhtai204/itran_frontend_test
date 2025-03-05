@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { authenticate } from "@/utils/action";
 import ModalReactive from "./modal.reactive";
 import ModalChangePassword from "./modal.change.pasword";
+import { auth } from "@/auth";
+import { getSession } from "next-auth/react";
 
 const Login = () => {
 
@@ -37,9 +39,19 @@ const Login = () => {
             description: res?.error,
           });
         } else {
+          const session = await getSession();
+          const role_id = session?.user?.role_id;
+
+          if(Number(role_id) === 2){
+            // console.log('admin');
+            // redirect to dashboard
+            router.push("/dashboard");
+          } else {
+            router.push("/user");
+          }
+
           // redirect to dashboard
-          router.push("/dashboard");
-          // console.log('>>>res: ', session);
+          // router.push("/dashboard");
         }
       };
 

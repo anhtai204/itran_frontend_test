@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
-
+import { ThemeProvider } from "@/components/(shadcn)/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,11 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html style={{ height: "100%" }} lang="en">
-      <body style={{ height: "100%" }} className={`${geistSans.variable} ${geistMono.variable}`}>
-        <AntdRegistry>
-          <NextAuthWrapper>{children}</NextAuthWrapper>
-        </AntdRegistry>
+    <html style={{ height: "100%" }} lang="en" suppressHydrationWarning>
+      <body
+        style={{ height: "100%" }}
+        className={`${geistSans.variable} ${geistMono.variable}`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AntdRegistry>
+            <NextAuthWrapper>{children}</NextAuthWrapper>
+          </AntdRegistry>
+        </ThemeProvider>
       </body>
     </html>
   );

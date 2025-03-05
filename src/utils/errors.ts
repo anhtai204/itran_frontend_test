@@ -12,9 +12,21 @@ export class CustomAuthError extends AuthError {
 }
 
 export class InvalidEmailPasswordError extends AuthError {
-  static type = "Email/Password khong hop le!"
+  static type = "Email/Password không hợp lệ!"
 }
 
 export class InactiveAccountError extends AuthError {
-    static type = "Tai khoan chua duoc kich hoat!"
-  }
+  static type = "Tài khoản chưa được kích hoạt!"
+}
+
+export class ForbiddenError extends AuthError {
+  static type = "Không có quyền truy cập!"
+}
+
+export class NotFoundError extends AuthError {
+  static type = "Không tìm thấy trang!"
+}
+
+export class RequestTimeOutError extends AuthError {
+  static type = "Yêu cầu đã hết thời gian!"
+}

@@ -1,7 +1,13 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { sendRequest } from "./utils/api";
-import { InactiveAccountError, InvalidEmailPasswordError } from "./utils/errors";
+import {
+  ForbiddenError,
+  InactiveAccountError,
+  InvalidEmailPasswordError,
+  NotFoundError,
+  RequestTimeOutError,
+} from "./utils/errors";
 import { IUser } from "./types/next-auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -21,24 +27,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           body: {
             username: credentials.username,
             password: credentials.password,
-          }
+          },
         });
 
-        if(res.statusCode === 201){
+        if (res.statusCode === 201) {
           return {
             id: res.data?.user?.id,
             username: res.data?.user?.name,
             email: res.data?.user?.email,
             access_token: res.data?.access_token,
-          }
-        } else if(+res.statusCode === 401) {
+            role_id: res.data?.user?.role_id,
+          };
+        } else if (+res.statusCode === 401) {
           throw new InvalidEmailPasswordError();
-        } else if(+res.statusCode === 400) {
+        } else if (+res.statusCode === 400) {
           throw new InactiveAccountError();
+        } else if (+res.statusCode === 403) {
+          throw new ForbiddenError();
+        } else if (+res.statusCode === 404) {
+          throw new NotFoundError();
+        } else if (+res.statusCode === 408) {
+          throw new RequestTimeOutError();
         } else {
-          throw new Error("Internal server error")
+          throw new Error("Internal server error");
         }
-
 
         // return user object with their profile data
         return user;
@@ -46,21 +58,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   pages: {
-    signIn: "/auth/login"
+    signIn: "/auth/login",
   },
   callbacks: {
     jwt({ token, user }) {
-      if(user) {
-        token.user = (user as IUser);
+      if (user) {
+        token.user = user as IUser;
       }
       return token;
     },
     session({ session, token }) {
-      (session.user as IUser) = token.user
-      return session
+      (session.user as IUser) = token.user;
+      return session;
     },
     authorized: async ({ auth }) => {
-        return !!auth;
-    }
-  }
+      return !!auth;
+    },
+  },
 });

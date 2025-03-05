@@ -1,4 +1,5 @@
 'use client'
+import { ModeToggle } from "@/components/ui/toggle-themes";
 import { Layout} from "antd";
 import React from "react";
 
@@ -8,6 +9,7 @@ const DashBoardPage = () => {
     return (
         <>
             Dashboard Page
+            <ModeToggle />
         </>
     );
 };
