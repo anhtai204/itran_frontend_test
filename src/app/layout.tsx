@@ -4,6 +4,7 @@ import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
 import { ThemeProvider } from "@/components/(shadcn)/theme-provider";
+import { ThemeSwitcher } from "@/components/(shadcn)/theme-switcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
