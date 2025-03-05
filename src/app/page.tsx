@@ -28,10 +28,14 @@ import ai4 from "../assets/images/ai4.jpg";
 import ai5 from "../assets/images/ai5.jpg";
 import ai6 from "../assets/images/ai6.png";
 import ai7 from "../assets/images/ai7.png";
+import ai8 from "../assets/images/ai8.webp";
+import ai9 from "../assets/images/ai9.webp";
+
 import { ThemeSwitcher } from "@/components/(shadcn)/theme-switcher";
+import { ImageSlider } from "@/components/(shadcn)/image-slider";
 
 export default function Home() {
-  const images = [ani, ai, doof, earth, hnue];
+  const images = [ai1, ai2, ai3, ai4, ai5, ai6, ai7, ai8, ai9, ani, ai, doof, earth, hnue, meme];
 
   return (
     <div className="flex min-h-screen flex-col dark:bg-gray-900 dark:text-gray-100">
@@ -70,9 +74,9 @@ export default function Home() {
                 Sign up
               </Link>
             </Button>
-            <div className="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-400 w-8 h-8 text-white">
+            {/* <div className="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-400 w-8 h-8 text-white">
               <span className="text-xs">JD</span>
-            </div>
+            </div> */}
             <div className="flex justify-end">
               <ThemeSwitcher />
             </div>
@@ -81,7 +85,7 @@ export default function Home() {
       </header>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-b from-purple-100 to-white dark:from-purple-900 dark:to-gray-800 pt-16 pb-24">
+        <section className="relative bg-gradient-to-b from-purple-100 to-white dark:from-purple-900 dark:to-gray-800 pt-16 pb-18">
           <div className="container text-center max-w-3xl mx-auto px-4">
             <div className="inline-flex items-center rounded-full border bg-white dark:bg-gray-800 dark:border-gray-700 px-3 py-1 text-sm mb-6">
               <span className="text-xs dark:text-gray-300">
@@ -127,24 +131,8 @@ export default function Home() {
           </div>
 
           {/* Profile Images */}
-          <div className="container overflow-hidden">
-            <div className="flex gap-4 justify-center">
-              {images.map((src, index) => (
-                <div
-                  key={index}
-                  className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden"
-                >
-                  <Image
-                    src={src}
-                    alt={`Profile ${index + 1}`}
-                    width={128}
-                    height={300}
-                    // className="object-cover"
-                    className="rounded-full"
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="container overflow-hidden py-8">
+            <ImageSlider images={images} />
           </div>
         </section>
 
@@ -193,7 +181,7 @@ export default function Home() {
                   role: "UI/UX Expert",
                   rating: "4.8",
                   projects: "15",
-                  featured: true,
+                  // featured: true,
                   image: { src: ai2, alt: "Dorothy Wood" },
                 },
                 {
