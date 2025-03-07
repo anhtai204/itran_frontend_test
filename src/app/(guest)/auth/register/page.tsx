@@ -1,9 +1,15 @@
-import Register from "@/components/auth/register"
+import Register from "@/components/auth/register";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 
 const RegisterPage = () => {
-    return (
-        <Register />
-    )
-}
+  return (
+    <>
+      <Header />
+      <Register />
+      <Footer />
+    </>
+  );
+};
 
 export default RegisterPage;

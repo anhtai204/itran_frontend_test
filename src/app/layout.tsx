@@ -4,7 +4,7 @@ import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
 import { ThemeProvider } from "@/components/(shadcn)/theme-provider";
-import { ThemeSwitcher } from "@/components/(shadcn)/theme-switcher";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +41,7 @@ export default function RootLayout({
           <AntdRegistry>
             <NextAuthWrapper>{children}</NextAuthWrapper>
           </AntdRegistry>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

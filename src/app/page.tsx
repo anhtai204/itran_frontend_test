@@ -33,18 +33,20 @@ import ai9 from "../assets/images/ai9.webp";
 
 import { ThemeSwitcher } from "@/components/(shadcn)/theme-switcher";
 import { ImageSlider } from "@/components/(shadcn)/image-slider";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
 
 export default function Home() {
   const images = [ai1, ai2, ai3, ai4, ai5, ai6, ai7, ai8, ai9, ani, ai, doof, earth, hnue, meme];
 
   return (
     <div className="flex min-h-screen flex-col dark:bg-gray-900 dark:text-gray-100">
-      <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-800 dark:border-gray-700">
+      {/* <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-800 dark:border-gray-700">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-400 bg-clip-text text-transparent">
-                ITACH EDU
+                ITRAN EDU
               </span>
             </Link>
             <nav className="hidden md:flex gap-6">
@@ -74,15 +76,16 @@ export default function Home() {
                 Sign up
               </Link>
             </Button>
-            {/* <div className="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-400 w-8 h-8 text-white">
+            <div className="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-400 w-8 h-8 text-white">
               <span className="text-xs">JD</span>
-            </div> */}
+            </div>
             <div className="flex justify-end">
               <ThemeSwitcher />
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
+      <Header /> 
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-b from-purple-100 to-white dark:from-purple-900 dark:to-gray-800 pt-16 pb-18">
@@ -181,7 +184,7 @@ export default function Home() {
                   role: "UI/UX Expert",
                   rating: "4.8",
                   projects: "15",
-                  // featured: true,
+                  featured: true,
                   image: { src: ai2, alt: "Dorothy Wood" },
                 },
                 {
@@ -229,7 +232,7 @@ export default function Home() {
               ].map((profile, i) => (
                 <div
                   key={i}
-                  className={`rounded-xl p-4 flex flex-col items-center ${
+                  className={`rounded-xl p-4 flex flex-col items-center dark:border-gray-600 text-sm dark:text-gray-300 ${
                     profile.featured
                       ? "bg-blue-50 border border-blue-100"
                       : "border"
@@ -241,7 +244,7 @@ export default function Home() {
                       alt={profile.image.alt}
                       width={64}
                       height={64}
-                      className="object-cover"
+                      className="object-cover "
                     />
                   </div>
                   <h3 className="font-semibold dark:text-white">
@@ -382,7 +385,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm">Showcase Work</h3>
+                      <h3 className="font-semibold text-sm dark:text-gray-700">Showcase Work</h3>
                       <p className="text-xs text-gray-500">
                         Display your portfolio to potential clients
                       </p>
@@ -415,7 +418,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm">Secure Payments</h3>
+                      <h3 className="font-semibold text-sm dark:text-gray-700">Secure Payments</h3>
                       <p className="text-xs text-gray-500">
                         Safe and reliable payment system
                       </p>
@@ -449,13 +452,13 @@ export default function Home() {
                         />
                       </svg>
                     </div>
-                    <h3 className="font-semibold">Showcase Work</h3>
+                    <h3 className="font-semibold dark:text-gray-700">Showcase Work</h3>
                   </div>
                   <p className="text-sm text-gray-600">
                     Display your portfolio and skills to potential clients and
                     employers
                   </p>
-                  <Button className="mt-3 rounded-full">Get Started</Button>
+                  <Button className="mt-3 rounded-full dark:bg-gray-200">Get Started</Button>
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -475,13 +478,13 @@ export default function Home() {
                         />
                       </svg>
                     </div>
-                    <h3 className="font-semibold">Find Clients</h3>
+                    <h3 className="font-semibold dark:text-gray-700">Find Clients</h3>
                   </div>
                   <p className="text-sm text-gray-600">
                     Connect with businesses looking for your specific skills and
                     expertise
                   </p>
-                  <Button className="mt-3 rounded-full">Explore</Button>
+                  <Button className="mt-3 rounded-full dark:bg-gray-200">Explore</Button>
                 </div>
               </div>
             </div>
@@ -604,7 +607,7 @@ export default function Home() {
             </h2>
 
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-900 text-white p-8 rounded-xl">
+              <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="font-semibold">Michael Ross</h3>
@@ -794,7 +797,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <Button className="mt-8 bg-white text-indigo-600 hover:bg-white/90 hover:text-indigo-700 rounded-full">
+              <Button className="mt-8 bg-white text-indigo-600 hover:bg-white/90 hover:text-indigo-700 rounded-full ">
                 Get Started
               </Button>
             </div>
@@ -802,13 +805,13 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t bg-white dark:bg-gray-800 dark:border-gray-700 py-12">
+      {/* <footer className="border-t bg-white dark:bg-gray-800 dark:border-gray-700 py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <Link href="/" className="flex items-center mb-4">
                 <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-400 bg-clip-text text-transparent">
-                  ITACH EDU
+                  ITRAN EDU
                 </span>
               </Link>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -816,7 +819,7 @@ export default function Home() {
               </p>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 <p>Phone: +1 (123) 456-7890</p>
-                <p>Email: contact@itachedu.com</p>
+                <p>Email: contact@ITRANedu.com</p>
               </div>
             </div>
 
@@ -1003,7 +1006,9 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </footer>
+      </footer> */}
+
+      <Footer />
     </div>
   );
 }
