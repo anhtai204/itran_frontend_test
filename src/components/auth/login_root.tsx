@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authenticate } from "@/utils/action";
-import ModalReactive from "./modal.reactive";
+import ModalReactive from "./modal.reactive.root";
 import ModalChangePassword from "./modal.change.pasword";
 import { auth } from "@/auth";
 import { getSession } from "next-auth/react";

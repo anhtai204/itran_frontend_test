@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
 import { UserIcon, CheckCircle2Icon, MailIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -115,9 +114,6 @@ const ModalChangePassword = (props: any) => {
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl">Quên mật khẩu</DialogTitle>
-            {/* <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleClose}>
-                <X className="h-4 w-4" />
-              </Button> */}
           </div>
         </DialogHeader>
 
