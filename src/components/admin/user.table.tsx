@@ -19,6 +19,7 @@ import {
 } from "@/utils/action";
 import { title } from "process";
 import { MenuItemType } from "antd/es/menu/interface";
+import UserCreateModal from "./user-create-modal";
 
 interface IProps {
   users: any;
@@ -93,33 +94,7 @@ const UserTable = (props: IProps) => {
       message.error("Error while update role");
     }
   };
-  //   {
-  //     label: "Admin",
-  //     key: "Admin",
-  //     //   icon: <UserOutlined />,
-  //   },
-  //   {
-  //     label: "Editor",
-  //     key: "Editor",
-  //   },
-  //   {
-  //     label: "Teacher",
-  //     key: "Teacher",
-  //   },
-  //   {
-  //     label: "Student",
-  //     key: "Student",
-  //   },
-  //   {
-  //     label: "Teaching Assistant",
-  //     key: "Teaching Assistant",
-  //   },
-  // ];
-
-  // const items: MenuProps["items"] = menuItems;
-
-  // const roles = ["Admin", "Editor", "Teacher", "Student", "Teaching Assistant"];
-
+  
   const columns = [
     {
       title: "STT",
@@ -243,7 +218,7 @@ const UserTable = (props: IProps) => {
         onChange={onChange}
       />
 
-      <UserCreate
+      {/* <UserCreate
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
       />
@@ -253,6 +228,11 @@ const UserTable = (props: IProps) => {
         setIsUpdateModalOpen={setIsUpdateModalOpen}
         dataUpdate={dataUpdate}
         setDataUpdate={setDataUpdate}
+      /> */}
+
+      <UserCreateModal
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
       />
     </>
   );

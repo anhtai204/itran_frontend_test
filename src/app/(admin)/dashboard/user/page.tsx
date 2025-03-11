@@ -1,5 +1,6 @@
 
 import { auth } from "@/auth";
+import UserTableModal from "@/components/admin/user-table-modal";
 import UserTable from "@/components/admin/user.table";
 import { sendRequest } from "@/utils/api";
 
@@ -42,7 +43,12 @@ const ManageUserPage = async (props: IProps) => {
 
     return (
         <div>
-            <UserTable
+            {/* <UserTable
+                users={res?.data?.results ?? []}
+                meta={res?.data?.meta}
+            /> */}
+
+            <UserTableModal
                 users={res?.data?.results ?? []}
                 meta={res?.data?.meta}
             />

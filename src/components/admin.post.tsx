@@ -1,0 +1,195 @@
+"use client"
+
+import { useState } from "react"
+import { PostEditor } from "@/components/post-editor"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { CalendarIcon, Globe, Lock, Users } from "lucide-react"
+import { FileUploadArea } from "@/components/file-upload-area"
+import { useHasMounted } from "@/utils/customHook"
+
+export default function PostsPage() {
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [category, setCategory] = useState("")
+  const [visibility, setVisibility] = useState("public")
+  const [isPublished, setIsPublished] = useState(false)
+  const [featuredImage, setFeaturedImage] = useState("")
+  const [tags, setTags] = useState("")
+
+  const hasMounted = useHasMounted();
+
+  if (!hasMounted) return <></>;
+
+
+  const handleFeaturedImageSelect = (file: File) => {
+    console.log("Selected featured image:", file)
+    // In a real app, you would upload this file to your server/cloud storage
+  }
+
+  const handleFeaturedImageUpload = (url: string) => {
+    setFeaturedImage(url)
+  }
+
+  return (
+    <div className="flex min-h-screen">
+      <div className="flex-1 lg:ml-64">
+
+        <main className="p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold">Create New Post</h1>
+            <div className="flex items-center gap-4">
+              <Button variant="outline">Save Draft</Button>
+              <Button>Publish</Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Post Content</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Title</Label>
+                      <Input
+                        id="title"
+                        placeholder="Enter post title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Enter post description"
+                        rows={3}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Content Blocks</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PostEditor />
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Settings</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="design">Design</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Visibility</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        variant={visibility === "public" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setVisibility("public")}
+                        className="flex items-center gap-2"
+                      >
+                        <Globe className="h-4 w-4" />
+                        Public
+                      </Button>
+                      <Button
+                        variant={visibility === "private" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setVisibility("private")}
+                        className="flex items-center gap-2"
+                      >
+                        <Lock className="h-4 w-4" />
+                        Private
+                      </Button>
+                      <Button
+                        variant={visibility === "restricted" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setVisibility("restricted")}
+                        className="flex items-center gap-2"
+                      >
+                        <Users className="h-4 w-4" />
+                        Restricted
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="published">Published</Label>
+                    <Switch id="published" checked={isPublished} onCheckedChange={setIsPublished} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Schedule</Label>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <span>Pick a date</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Tags</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Input
+                    placeholder="Add tags separated by commas"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Featured Image</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <FileUploadArea
+                    onFileSelect={handleFeaturedImageSelect}
+                    onFileUpload={handleFeaturedImageUpload}
+                    value={featuredImage}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
+

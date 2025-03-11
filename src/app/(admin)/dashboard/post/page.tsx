@@ -1,8 +1,10 @@
+import PostsPage from "@/components/admin.post";
+
 const PostManage = () => {
     return (
-        <div>
-            Post Manage
-        </div>
+        <>
+            <PostsPage />
+        </>
     )
 }
 

@@ -42,6 +42,11 @@ const menuItems = [
         icon: ShoppingCart,
         href: "/ecommerce",
       },
+      {
+        title: "Mange User",
+        icon: UserCircle,
+        href: "/dashboard/user",
+      },
     ],
   },
   {
@@ -113,9 +118,9 @@ const menuItems = [
         href: "/timeline",
       },
       {
-        title: "Pages",
+        title: "Post",
         icon: File,
-        href: "/pages",
+        href: "dashboard/post",
       },
     ],
   },

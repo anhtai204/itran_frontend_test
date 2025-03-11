@@ -65,7 +65,7 @@ const Login = () => {
       console.log(">>>session: ", session);
       console.log(">>>role_id: ", role_id);
 
-      if (Number(role_id) === 2) {
+      if (Number(role_id) === 1) {
         router.push("/dashboard");
       } else {
         router.push("/user");
