@@ -38,9 +38,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AntdRegistry>
+          {/* <AntdRegistry> */}
             <NextAuthWrapper>{children}</NextAuthWrapper>
-          </AntdRegistry>
+          {/* </AntdRegistry> */}
           <Toaster />
         </ThemeProvider>
       </body>

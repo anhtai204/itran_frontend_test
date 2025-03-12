@@ -1,3 +1,5 @@
+'use client'
+
 import { Bell, Search, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -5,8 +7,12 @@ import { ThemeToggle } from "./theme-toggle";
 
 import ai6 from "../assets/images/ai6.png";
 import Image from "next/image";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { signOut } from "next-auth/react";
 
-export function Header() {
+const Header = (props: any) => {
+  const {session} = props;
+  console.log('>>> check session header: ', session);
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-4 sm:px-6">
@@ -40,17 +46,29 @@ export function Header() {
 
           <ThemeToggle />
 
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Image
-              src={ai6}
-              alt="Avatar"
-              className="rounded-full"
-              height={32}
-              width={32}
-            />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Image
+                  src={ai6}
+                  alt="Avatar"
+                  className="rounded-full"
+                  height={32}
+                  width={32}
+                />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>{session?.user?.username ?? ""}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut()}>
+                  Đăng xuất
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
   );
 }
+
+export default Header;

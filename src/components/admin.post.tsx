@@ -1,50 +1,71 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PostEditor } from "@/components/post-editor"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { CalendarIcon, Globe, Lock, Users } from "lucide-react"
-import { FileUploadArea } from "@/components/file-upload-area"
-import { useHasMounted } from "@/utils/customHook"
+import React, { useState } from "react";
+import { PostEditor } from "@/components/post-editor";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  CalendarIcon,
+  Globe,
+  Lock,
+  Users,
+  MessageSquare,
+  Bell,
+} from "lucide-react";
+import { FileUploadArea } from "@/components/file-upload-area";
+import { useHasMounted } from "@/utils/customHook";
+import { Calendar } from "./ui/calendar";
 
 export default function PostsPage() {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [category, setCategory] = useState("")
-  const [visibility, setVisibility] = useState("public")
-  const [isPublished, setIsPublished] = useState(false)
-  const [featuredImage, setFeaturedImage] = useState("")
-  const [tags, setTags] = useState("")
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [category, setCategory] = useState("");
+  const [visibility, setVisibility] = useState("public");
+  const [isPublished, setIsPublished] = useState(false);
+  const [allowComments, setAllowComments] = useState(true);
+  const [receiveNotifications, setReceiveNotifications] = useState(true);
+  const [featuredImage, setFeaturedImage] = useState("");
+  const [tags, setTags] = useState("");
+  const [slug, setSlug] = useState("");
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const hasMounted = useHasMounted();
 
   if (!hasMounted) return <></>;
 
-
   const handleFeaturedImageSelect = (file: File) => {
-    console.log("Selected featured image:", file)
+    console.log("Selected featured image:", file);
     // In a real app, you would upload this file to your server/cloud storage
-  }
+  };
 
   const handleFeaturedImageUpload = (url: string) => {
-    setFeaturedImage(url)
-  }
+    setFeaturedImage(url);
+  };
 
   return (
     <div className="flex min-h-screen">
-      <div className="flex-1 lg:ml-64">
-
+      <div className="flex-1 lg:ml-20">
         <main className="p-6 space-y-6">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">Create New Post</h1>
             <div className="flex items-center gap-4">
-              <Button variant="outline">Save Draft</Button>
+              <Button variant="outline" className="dark:text-white">
+                Save Draft
+              </Button>
               <Button>Publish</Button>
             </div>
           </div>
@@ -77,6 +98,21 @@ export default function PostsPage() {
                         onChange={(e) => setDescription(e.target.value)}
                       />
                     </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="excerpt">Excerpt</Label>
+                      <Textarea
+                        id="excerpt"
+                        placeholder="Enter post excerpt (used for social media and listings)"
+                        rows={2}
+                        value={excerpt}
+                        onChange={(e) => setExcerpt(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        A short summary of your post. If left empty, the
+                        description will be used.
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -86,7 +122,14 @@ export default function PostsPage() {
                   <CardTitle>Content Blocks</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <PostEditor />
+                  <PostEditor
+                    title={title}
+                    description={description}
+                    excerpt={excerpt}
+                    featuredImage={featuredImage}
+                    allowComments={allowComments}
+                    receiveNotifications={receiveNotifications}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -116,7 +159,9 @@ export default function PostsPage() {
                     <Label>Visibility</Label>
                     <div className="grid grid-cols-3 gap-2">
                       <Button
-                        variant={visibility === "public" ? "default" : "outline"}
+                        variant={
+                          visibility === "public" ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setVisibility("public")}
                         className="flex items-center gap-2"
@@ -125,7 +170,9 @@ export default function PostsPage() {
                         Public
                       </Button>
                       <Button
-                        variant={visibility === "private" ? "default" : "outline"}
+                        variant={
+                          visibility === "private" ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setVisibility("private")}
                         className="flex items-center gap-2"
@@ -134,7 +181,9 @@ export default function PostsPage() {
                         Private
                       </Button>
                       <Button
-                        variant={visibility === "restricted" ? "default" : "outline"}
+                        variant={
+                          visibility === "restricted" ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setVisibility("restricted")}
                         className="flex items-center gap-2"
@@ -147,16 +196,65 @@ export default function PostsPage() {
 
                   <div className="flex items-center justify-between">
                     <Label htmlFor="published">Published</Label>
-                    <Switch id="published" checked={isPublished} onCheckedChange={setIsPublished} />
+                    <Switch
+                      id="published"
+                      checked={isPublished}
+                      onCheckedChange={setIsPublished}
+                    />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Schedule</Label>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      <span>Pick a date</span>
-                    </Button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="comments">Allow Comments</Label>
+                    </div>
+                    <Switch
+                      id="comments"
+                      checked={allowComments}
+                      onCheckedChange={setAllowComments}
+                    />
                   </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="notifications">
+                        Receive Notifications
+                      </Label>
+                    </div>
+                    <Switch
+                      id="notifications"
+                      checked={receiveNotifications}
+                      onCheckedChange={setReceiveNotifications}
+                    />
+                  </div>
+
+                    <div className="space-y-2">
+                    <Label>Schedule</Label>
+                    <div className="relative">
+                      <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                      >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <span>{date ? date.toDateString() : "Pick a date"}</span>
+                      </Button>
+                      {showCalendar && (
+                      <div className="absolute z-10 mt-2">
+                        <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(selectedDate) => {
+                          setDate(selectedDate);
+                          setShowCalendar(false);
+                        }}
+                        className="rounded-md border"
+                        />
+                      </div>
+                      )}
+                    </div>
+                    </div>
                 </CardContent>
               </Card>
 
@@ -169,6 +267,19 @@ export default function PostsPage() {
                     placeholder="Add tags separated by commas"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Slug</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Input
+                    placeholder="Add slug"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
                   />
                 </CardContent>
               </Card>
@@ -190,6 +301,5 @@ export default function PostsPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-

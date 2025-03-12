@@ -1,8 +1,8 @@
+import PostEditorTest from "@/components/post-test";
+
 const ERoomManage = () => {
     return (
-        <div>
-            eRoom Page
-        </div>
+        <PostEditorTest />
     )
 }
 
