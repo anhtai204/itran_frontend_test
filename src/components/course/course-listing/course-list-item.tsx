@@ -1,29 +1,31 @@
-import Link from "next/link"
-import { Star, Clock, Users, BarChart } from "lucide-react"
-import { Badge } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { StaticImport } from "next/dist/shared/lib/get-img-props"
-import Image from "next/image"
+import Link from "next/link";
+import { Star, Clock, Users, BarChart } from "lucide-react";
+import { Badge } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
 
 interface CourseProps {
   course: {
-    id: number
-    slug: string
-    title: string
-    instructor: string
-    price: number
-    originalPrice: number
-    rating: number
-    reviewCount: number
-    level: string
-    category: string
-    image: StaticImport
-    featured?: boolean
-  }
+    id: number;
+    slug: string;
+    title: string;
+    instructor: string;
+    price: number;
+    originalPrice: number;
+    rating: number;
+    reviewCount: number;
+    level: string;
+    category: string;
+    image: StaticImport;
+    featured?: boolean;
+  };
 }
 
 export function CourseListItem({ course }: CourseProps) {
-  const discount = Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)
+  const discount = Math.round(
+    ((course.originalPrice - course.price) / course.originalPrice) * 100
+  );
 
   return (
     <div
@@ -39,7 +41,9 @@ export function CourseListItem({ course }: CourseProps) {
             className="w-full h-48 md:h-full object-cover"
           />
           {course.featured && (
-            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-purple-600 to-indigo-500">Featured</Badge>
+            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-purple-600 to-indigo-500">
+              Featured
+            </Badge>
           )}
           <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded">
             {discount}% OFF
@@ -56,9 +60,13 @@ export function CourseListItem({ course }: CourseProps) {
             </span>
           </div>
 
-          <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-xl mb-2">{course.title}</h3>
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-2">
+            {course.title}
+          </h3>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">by {course.instructor}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            by {course.instructor}
+          </p>
 
           <div className="flex items-center mb-3">
             <div className="flex mr-1">
@@ -66,16 +74,22 @@ export function CourseListItem({ course }: CourseProps) {
                 <Star
                   key={i}
                   className={`h-4 w-4 ${
-                    i < Math.floor(course.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                    i < Math.floor(course.rating)
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">{course.rating}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({course.reviewCount} reviews)</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+              {course.rating}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+              ({course.reviewCount} reviews)
+            </span>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="text-xs flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
               <span>2 Weeks</span>
@@ -92,7 +106,9 @@ export function CourseListItem({ course }: CourseProps) {
 
           <div className="mt-auto flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-gray-900 dark:text-white">${course.price}</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                ${course.price}
+              </span>
               <span className="text-sm text-gray-500 dark:text-gray-400 line-through ml-2">
                 ${course.originalPrice}
               </span>
@@ -107,6 +123,5 @@ export function CourseListItem({ course }: CourseProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
