@@ -58,7 +58,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-white dark:from-purple-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-6">
+      <div className="w-full max-w-4xl grid lg:grid-cols-2 gap-6">
         {/* Left Section */}
         <div className="p-8 flex flex-col">
           <div className="flex-1">
