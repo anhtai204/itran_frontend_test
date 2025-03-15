@@ -1,19 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PostEditor } from "@/components/post-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
   CalendarIcon,
@@ -25,13 +18,14 @@ import {
 } from "lucide-react";
 import { FileUploadArea } from "@/components/file-upload-area";
 import { useHasMounted } from "@/utils/customHook";
-import { Calendar } from "./ui/calendar";
+import { handleGetCategories } from "@/utils/action";
+import { MultiSelect } from "./ui/multi-select";
 
 export default function PostsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [category, setCategory] = useState("");
+  // const [categories, setCategories] = useState({});
   const [visibility, setVisibility] = useState("public");
   const [isPublished, setIsPublished] = useState(false);
   const [allowComments, setAllowComments] = useState(true);
@@ -39,11 +33,39 @@ export default function PostsPage() {
   const [featuredImage, setFeaturedImage] = useState("");
   const [tags, setTags] = useState("");
   const [slug, setSlug] = useState("");
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-
+  const [date, setDate] = useState<Date | undefined>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
 
+  const [categories, setCategories] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
   const hasMounted = useHasMounted();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const items = await handleGetCategories();
+        if (Array.isArray(items)) {
+          // Transform the data to match the MultiSelect Option type
+          const formattedCategories = items.map((item) => ({
+            label: item.label,
+            value: item.key,
+          }));
+          setCategories(formattedCategories);
+        } else {
+          console.error("Categories data is not an array:", items);
+          setCategories([]);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   if (!hasMounted) return <></>;
 
@@ -141,18 +163,29 @@ export default function PostsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
-                    <Select value={category} onValueChange={setCategory}>
+                    {/* <Label htmlFor="category">Category</Label>
+                    <Select value={categories} onValueChange={setCategory}>
                       <SelectTrigger id="category">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="technology">Technology</SelectItem>
-                        <SelectItem value="design">Design</SelectItem>
-                        <SelectItem value="business">Business</SelectItem>
-                        <SelectItem value="marketing">Marketing</SelectItem>
-                      </SelectContent>
-                    </Select>
+                        <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.name}>
+                          {category.name}
+                          </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select> */}
+                    <Label htmlFor="categories">Categories</Label>
+                    <MultiSelect
+                      options={categories}
+                      selected={selectedCategories}
+                      onChange={setSelectedCategories}
+                      placeholder="Select categories"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Select one or more categories for your post.
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -229,32 +262,34 @@ export default function PostsPage() {
                     />
                   </div>
 
-                    <div className="space-y-2">
+                  <div className="space-y-2">
                     <Label>Schedule</Label>
                     <div className="relative">
                       <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                      onClick={() => setShowCalendar(!showCalendar)}
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                        onClick={() => setShowCalendar(!showCalendar)}
                       >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      <span>{date ? date.toDateString() : "Pick a date"}</span>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <span>
+                          {date ? date.toDateString() : "Pick a date"}
+                        </span>
                       </Button>
                       {showCalendar && (
-                      <div className="absolute z-10 mt-2">
-                        <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(selectedDate) => {
-                          setDate(selectedDate);
-                          setShowCalendar(false);
-                        }}
-                        className="rounded-md border"
-                        />
-                      </div>
+                        <div className="absolute z-10 mt-2">
+                          {/* <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={(selectedDate) => {
+                            setDate(selectedDate);
+                            setShowCalendar(false);
+                          }}
+                          className="rounded-md border"
+                          /> */}
+                        </div>
                       )}
                     </div>
-                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

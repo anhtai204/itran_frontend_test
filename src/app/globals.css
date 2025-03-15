@@ -318,3 +318,39 @@ a {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+
+
+
+/* Styles cho KaTeX */
+.katex-node {
+  margin: 1rem 0;
+}
+
+.katex-empty {
+  min-height: 2rem;
+}
+
+.katex-rendered {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  overflow-x: auto;
+}
+
+.dark .katex-rendered {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Fix for KaTeX rendering in preview */
+/* .katex {
+  font-size: 1.1em !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}
+
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+} */

@@ -1,26 +1,11 @@
-'use client'
-
-import { Layout } from "antd";
+"use client";
 
 const UserContent = ({
     children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) => {
-    const { Content } = Layout;
-
-    return (
-        <Content>
-            <div
-                style={{
-                    padding: 24,
-                    minHeight: 'calc(100vh - 180px)',
-                }}
-            >
-                {children}
-            </div>
-        </Content>
-    )
-}
+  }: Readonly<{
+    children: React.ReactNode
+  }>) => {
+    return <main className="p-6 min-h-[calc(100vh-180px)]">{children}</main>
+  }
 
 export default UserContent;

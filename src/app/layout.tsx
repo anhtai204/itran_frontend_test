@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
+// import { AntdRegistry } from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
 import { ThemeProvider } from "@/components/(shadcn)/theme-provider";
 import { Toaster } from "@/components/ui/sonner";

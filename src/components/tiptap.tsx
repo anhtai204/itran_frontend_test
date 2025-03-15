@@ -5,6 +5,12 @@ import StarterKit from "@tiptap/starter-kit";
 import MenuBar from "./menu-bar";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import { Katex } from "./tiptap-extensions/katex-extension";
+import { MathToolbar } from "./math-toolbar";
+import "katex/dist/katex.min.css";
 
 interface TiptapProps {
   content: string;
@@ -34,12 +40,13 @@ export default function Tiptap({ content, onChange }: TiptapProps) {
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
-      //   Highlight.configure({
-      //     HTMLAttributes: {
-      //       class: "hover:bg-red-500",
-      //     },
-      //   }),
       Highlight,
+      Underline,
+      Link.configure({
+        openOnClick: false,
+      }),
+      Image,
+      Katex,
     ],
     content: content,
     editorProps: {
@@ -49,13 +56,14 @@ export default function Tiptap({ content, onChange }: TiptapProps) {
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange(editor.getHTML())
     },
   });
 
   return (
     <div>
       <MenuBar editor={editor} />
+      <MathToolbar editor={editor} />
       <EditorContent editor={editor} />
     </div>
   );
