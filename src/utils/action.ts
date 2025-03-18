@@ -254,15 +254,65 @@ export const handleDeleteCategory = async (id: string) => {
 
 
 
-export const handleCreatePost = async (postData: any) => {
-  // Placeholder implementation
-  console.log("handleCreatePost called with", postData)
-  return {
-    statusCode: 201,
-    message: "Post created successfully",
-    data: {
-      id: "new-post-id",
-      title: postData.title,
-    },
+export const handleCreatePost = async (data: any) => {
+  const session = await auth();
+
+  const { title, content, description, excerpt, post_status, slug, categories_id, author_id, visibility, comment_status, ping_status, create_at } = data;
+
+  try {
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session?.user?.access_token}`,
+      },
+      body: {
+        title,
+        content,
+        description,
+        excerpt,
+        post_status,
+        slug,
+        categories_id,
+        author_id,
+        visibility,
+        comment_status,
+        ping_status,
+        create_at
+      },
+    });
+
+    revalidateTag("categories");
+    return res;
+  } catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
   }
-}
+};
+
+
+
+export const handleGetTags = async () => {
+  const session = await auth();
+  try {
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories/post-tags`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${session?.user?.access_token}`,
+      },
+    });
+
+    if (res.statusCode === 200 && Array.isArray(res.data)) {
+      const items = res.data.map((tag) => ({
+        label: tag.name, // Gán label từ name
+        key: tag.id, // Gán key từ id
+      }));
+      return items;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};

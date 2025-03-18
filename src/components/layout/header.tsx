@@ -20,7 +20,7 @@ const Header = () => {
                 Home
               </Link>
               <Link
-                href="/explore"
+                href="/posts"
                 className="text-sm font-medium dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               >
                 Explore

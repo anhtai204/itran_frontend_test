@@ -5,6 +5,8 @@ import "./globals.css";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
 import { ThemeProvider } from "@/components/(shadcn)/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { auth } from "@/auth";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,11 +23,12 @@ export const metadata: Metadata = {
   description: "Your Professional Marketplace",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html style={{ height: "100%" }} lang="en" suppressHydrationWarning>
       <body
@@ -39,7 +42,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/* <AntdRegistry> */}
-            <NextAuthWrapper>{children}</NextAuthWrapper>
+          <SessionProvider>
+            <NextAuthWrapper >{children}</NextAuthWrapper>
+          </SessionProvider>
           {/* </AntdRegistry> */}
           <Toaster />
         </ThemeProvider>

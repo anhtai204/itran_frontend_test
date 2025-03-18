@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import "katex/dist/katex.min.css"
+import katex from "katex"
 
 interface Block {
   id: string
@@ -31,6 +33,16 @@ export function PostPreview({
   receiveNotifications = true,
 }: PostPreviewProps) {
   const [mounted, setMounted] = useState(false)
+
+  console.log('>>>title preview: ', title);
+  console.log('>>>description preview: ', description);
+  console.log('>>>excerpt preview: ', excerpt);
+  console.log('>>>blocks preview: ', blocks);
+  console.log('>>>featuredImage preview: ', featuredImage);
+  console.log('>>>allowComments preview: ', allowComments);
+  console.log('>>>receiveNotifications preview: ', receiveNotifications);
+
+
 
   useEffect(() => {
     setMounted(true)
@@ -139,13 +151,14 @@ export function PostPreview({
 }
 
 function renderBlockPreview(block: Block) {
+  console.log('>>>block: ', block);
   switch (block.type) {
     case "text":
-    case "list":
       return (
         <div
           dangerouslySetInnerHTML={{
-            __html: block.content || "<p>Empty text block</p>",
+            __html: renderKatex(block.content) || "<p>Empty text block</p>",
+            // __html: katex.renderToString("c = \\pm\\sqrt{a^2 + b^2}")
           }}
         />
       )
@@ -215,8 +228,31 @@ function renderBlockPreview(block: Block) {
           </div>
         )
       }
+    case "math":
+      return (
+        <div
+          className="my-4"
+          dangerouslySetInnerHTML={{
+            __html: katex.renderToString(block.content || "Empty formula", {
+              throwOnError: false,
+            }),
+          }}
+        />
+      )
     default:
       return <p>{block.content || "Empty block"}</p>
   }
 }
 
+// Helper function to render KaTeX formulas
+function renderKatex(content: string) {
+  const div = document.createElement('div');
+  div.innerHTML = content;
+  const katexElements = div.querySelectorAll('[data-formula]');
+  katexElements.forEach((el) => {
+    const tex = el.getAttribute('data-formula') || '';
+    const displayMode = el.getAttribute('data-display-mode') === 'true';
+    el.innerHTML = katex.renderToString(tex, { displayMode, throwOnError: false });
+  });
+  return div.innerHTML;
+}

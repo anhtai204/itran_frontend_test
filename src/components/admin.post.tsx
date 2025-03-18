@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { PostEditor } from "@/components/post-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,15 +17,24 @@ import {
   Bell,
 } from "lucide-react";
 import { FileUploadArea } from "@/components/file-upload-area";
-import { useHasMounted } from "@/utils/customHook";
-import { handleGetCategories } from "@/utils/action";
-import { MultiSelect } from "./ui/multi-select";
+import { handleGetCategories, handleCreatePost } from "@/utils/action";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { toast } from "sonner";
+import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 
-export default function PostsPage() {
+export default function PostsPage(props: any) {
+
+  const { session} = props;
+
+  // Đảm bảo tất cả các hooks được gọi ở cùng một thứ tự trong mỗi lần render
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  // const [categories, setCategories] = useState({});
+  const [categories, setCategories] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [visibility, setVisibility] = useState("public");
   const [isPublished, setIsPublished] = useState(false);
   const [allowComments, setAllowComments] = useState(true);
@@ -35,14 +44,21 @@ export default function PostsPage() {
   const [slug, setSlug] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [blocks, setBlocks] = useState<any[]>([
+    {
+      id: `block-initial-${Date.now()}`,
+      type: "text",
+      content: "",
+    },
+  ]);
 
-  const [categories, setCategories] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  // Xử lý client-side rendering
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const hasMounted = useHasMounted();
-
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -67,7 +83,16 @@ export default function PostsPage() {
     fetchCategories();
   }, []);
 
-  if (!hasMounted) return <></>;
+  // Generate slug from title
+  useEffect(() => {
+    if (title) {
+      const generatedSlug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      setSlug(generatedSlug);
+    }
+  }, [title]);
 
   const handleFeaturedImageSelect = (file: File) => {
     console.log("Selected featured image:", file);
@@ -78,6 +103,86 @@ export default function PostsPage() {
     setFeaturedImage(url);
   };
 
+  const handleSubmit = async (isDraft = false) => {
+    // Validate required fields
+    if (!title) {
+      // Show error message
+      toast("Title is required");
+      return;
+    }
+
+    // Prepare post data
+    const postData = {
+      title: title,
+      content: JSON.stringify(blocks[0].content),
+      description,
+      excerpt: excerpt || description,
+      post_status: isDraft ? "draft" : isPublished ? "published" : "draft",
+      slug,
+      categories_id: selectedCategories, // This will be an array of category IDs
+      author_id: session?.user?.id,
+      // featured_image: featuredImage,
+      visibility: visibility,
+      comment_status: allowComments,
+      ping_status: receiveNotifications,
+      // tags: tags
+      //   .split(",")
+      //   .map((tag) => tag.trim())
+      //   .filter(Boolean),
+      created_at: isPublished ? new Date().toISOString() : null,
+    };
+
+    // console.log('>>>author_id: ', session?.user?.id)
+    // console.log(">>>categoryIds: ", selectedCategories);
+    // console.log(">>>title: ", title);
+    // console.log(">>>description: ", description);
+    // console.log(">>>excerpt: ", excerpt);
+    // console.log(">>>post_status: ",isDraft ? "draft" : isPublished ? "published" : "draft");
+    // console.log(">>>allow_comments: ", allowComments);
+    // console.log(">>>receive_notifications: ", receiveNotifications);
+    // console.log(">>>tags: ", tags);
+    // console.log(">>>content: ", JSON.stringify(blocks[0].content));
+    // console.log('>>>published_at: ', isPublished ? new Date().toISOString() : null);
+    // console.log(">>>published_at: ", new Date().toISOString());
+
+    console.log('>>postData: ', postData);
+
+    try {
+      // const { title, content, description, excerpt, post_status, slug, categories_id, author_id, visibility, comment_status, ping_status, created_at } = postData;
+      const response = await handleCreatePost(postData)
+      if (response.statusCode === 201) {
+        // Show success message and redirect
+        console.log("Post created successfully:", response.data)
+        // Redirect to post list or view
+      } else {
+        // Show error message
+        console.error("Failed to create post:", response.message)
+      }
+    } catch (error) {
+      console.error("Error creating post:", error)
+    }
+  };
+
+  // Render loading state if not mounted
+  if (!mounted) {
+    return <div className="p-6">Loading post editor...</div>;
+  }
+
+  const showContent = () => {
+    console.log(">>>title: ", title);
+    console.log(">>>description: ", description);
+    console.log(">>>excerpt: ", excerpt);
+    console.log(">>>visibility: ", visibility);
+    console.log(">>>isPublished: ", isPublished);
+    console.log(">>>allowComments: ", allowComments);
+    console.log(">>>receiveNotifications: ", receiveNotifications);
+    console.log(">>>tags: ", tags);
+    console.log(">>>slug: ", slug);
+    console.log(">>>date: ", date);
+    console.log(">>>featured_image: ", featuredImage);
+    console.log(">>>block: ", blocks[0].content);
+  };
+
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 lg:ml-20">
@@ -85,10 +190,15 @@ export default function PostsPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">Create New Post</h1>
             <div className="flex items-center gap-4">
-              <Button variant="outline" className="dark:text-white">
+              <Button variant="outline" className="dark:text-white" onClick={() => handleSubmit(true)}>
+              {/* <Button
+                variant="outline"
+                className="dark:text-white"
+                onClick={() => showContent()}
+              > */}
                 Save Draft
               </Button>
-              <Button>Publish</Button>
+              <Button onClick={() => handleSubmit(false)}>Publish</Button>
             </div>
           </div>
 
@@ -151,6 +261,8 @@ export default function PostsPage() {
                     featuredImage={featuredImage}
                     allowComments={allowComments}
                     receiveNotifications={receiveNotifications}
+                    blocks={blocks}
+                    setBlocks={setBlocks}
                   />
                 </CardContent>
               </Card>
@@ -163,19 +275,6 @@ export default function PostsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    {/* <Label htmlFor="category">Category</Label>
-                    <Select value={categories} onValueChange={setCategory}>
-                      <SelectTrigger id="category">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                        <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.name}>
-                          {category.name}
-                          </SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select> */}
                     <Label htmlFor="categories">Categories</Label>
                     <MultiSelect
                       options={categories}
@@ -277,15 +376,7 @@ export default function PostsPage() {
                       </Button>
                       {showCalendar && (
                         <div className="absolute z-10 mt-2">
-                          {/* <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={(selectedDate) => {
-                            setDate(selectedDate);
-                            setShowCalendar(false);
-                          }}
-                          className="rounded-md border"
-                          /> */}
+                          {/* Calendar component would go here */}
                         </div>
                       )}
                     </div>
@@ -303,6 +394,10 @@ export default function PostsPage() {
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Tags help users find your content. Separate multiple tags
+                    with commas.
+                  </p>
                 </CardContent>
               </Card>
 
@@ -316,6 +411,11 @@ export default function PostsPage() {
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    The slug is the URL-friendly version of the title. It is
+                    usually all lowercase and contains only letters, numbers,
+                    and hyphens.
+                  </p>
                 </CardContent>
               </Card>
 

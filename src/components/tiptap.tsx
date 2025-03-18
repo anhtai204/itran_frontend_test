@@ -56,8 +56,10 @@ export default function Tiptap({ content, onChange }: TiptapProps) {
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      onChange(editor.getHTML());
     },
+    // Set immediatelyRender to false to avoid hydration mismatches
+    immediatelyRender: false,
   });
 
   return (
