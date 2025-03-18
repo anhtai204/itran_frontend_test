@@ -36,7 +36,7 @@ import { ImageSlider } from "@/components/(shadcn)/image-slider";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 
-export default function Home(props: any) {
+export default function Home() {
   const images = [ai1, ai2, ai3, ai4, ai5, ai6, ai7, ai8, ai9, ani, ai, doof, earth, hnue, meme];
 
   return (
@@ -764,33 +764,3 @@ export default function Home(props: any) {
     </div>
   );
 }
-
-
-// "use client"
-
-// import { useState, useEffect } from "react"
-// import Home from "@/components/home" // Giả sử bạn đã di chuyển nội dung trang chủ vào component này
-// import { HomePageSkeleton } from "@/components/(skeleton)/home-page-skeleton"
-
-// function HomePage() {
-//   const [loading, setLoading] = useState(true)
-
-//   useEffect(() => {
-//     // Simulate loading time
-//     const timer = setTimeout(() => {
-//       setLoading(false)
-//     }, 1500)
-
-//     return () => clearTimeout(timer)
-//   }, [])
-
-//   if (loading) {
-//     return <HomePageSkeleton />
-//   }
-
-//   return <Home />
-// }
-
-// export default function HomeWrapper() {
-//   return <HomePage />
-// }

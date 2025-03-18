@@ -1,20 +1,19 @@
 "use client";
 import React from "react";
-import "@ant-design/v5-patch-for-react-19";
-import { Button, Col, Divider, Form, Input, message, notification, Row } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { Coda } from "next/font/google";
+import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 const Verify = (props: any) => {
   const { id } = props;
   console.log('>>>id: ', id);
   const router = useRouter();
+
   const onFinish = async (values: any) => {
     const { id, code } = values;
-    // console.log('>>> check values:', values);
+    console.log('>>> check values:', values);
     const res = await sendRequest<IBackendRes<any>>({
       method: "POST",
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/check-code`,
@@ -24,76 +23,59 @@ const Verify = (props: any) => {
     });
     console.log(">>> check res: ", res);
     if (res?.data) {
-        message.success("Kích hoạt tài khoản thành công!");
+      toast("Kích hoạt tài khoản thành công!");
       router.push(`/auth/login`);
     } else {
-      notification.error({
-        message: "Verify error",
-        description: res?.message,
-      });
+      toast(res?.message);
     }
   };
 
   return (
-    <Row justify={"center"} style={{ marginTop: "30px" }}>
-      <Col xs={24} md={16} lg={8}>
-        <fieldset
-          style={{
-            padding: "15px",
-            margin: "5px",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-          }}
-        >
-          <legend>Kích hoạt Tài Khoản</legend>
-          <Form
-            name="basic"
-            onFinish={onFinish}
-            autoComplete="off"
-            layout="vertical"
-          >
-            <Form.Item 
-                label="Id" 
-                name="id" 
-                initialValue={id}
-                >
-              <Input disabled />
-            </Form.Item>
-
-            <div>
-              Mã code đã được gửi tới email đăng ký, vui lòng kiểm tra email
-            </div>
-            <Divider />
-
-            <Form.Item
-              label="Code"
-              name="code"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your code!",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
-          <Link href={"/"}>
-            <ArrowLeftOutlined /> Quay lại trang chủ
-          </Link>
-          <Divider />
-          <div style={{ textAlign: "center" }}>
-            Đã có tài khoản? <Link href={"/auth/login"}>Đăng nhập</Link>
+    <div className="flex justify-center mt-8">
+      <div className="w-full max-w-lg p-4 border border-gray-300 rounded-md">
+        <h2 className="text-lg font-semibold mb-4">Kích hoạt Tài Khoản</h2>
+        <form onSubmit={(e) => { e.preventDefault(); onFinish(e.target); }} className="space-y-4">
+          <div className="flex flex-col">
+            <label htmlFor="id" className="mb-1">Id</label>
+            <input
+              id="id"
+              name="id"
+              type="text"
+              defaultValue={id}
+              disabled
+              className="p-2 border border-gray-300 rounded-md"
+            />
           </div>
-        </fieldset>
-      </Col>
-    </Row>
+          <p className="text-sm text-gray-600">
+            Mã code đã được gửi tới email đăng ký, vui lòng kiểm tra email
+          </p>
+          <hr className="my-4" />
+          <div className="flex flex-col">
+            <label htmlFor="code" className="mb-1">Code</label>
+            <input
+              id="code"
+              name="code"
+              type="text"
+              required
+              className="p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Submit
+          </button>
+        </form>
+        <Link href="/" className="flex items-center mt-4 text-blue-500 hover:underline">
+        <ArrowLeft className="mr-1" /> Quay lại trang chủ
+        </Link>
+        <hr className="my-4" />
+        <div className="text-center">
+          Đã có tài khoản? <Link href="/auth/login" className="text-blue-500 hover:underline">Đăng nhập</Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

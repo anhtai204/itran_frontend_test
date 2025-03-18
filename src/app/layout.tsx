@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
+// import { AntdRegistry } from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
 import { ThemeProvider } from "@/components/(shadcn)/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { auth } from "@/auth";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,11 +23,12 @@ export const metadata: Metadata = {
   description: "Your Professional Marketplace",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html style={{ height: "100%" }} lang="en" suppressHydrationWarning>
       <body
@@ -38,9 +41,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AntdRegistry>
-            <NextAuthWrapper>{children}</NextAuthWrapper>
-          </AntdRegistry>
+          {/* <AntdRegistry> */}
+          <SessionProvider>
+            <NextAuthWrapper >{children}</NextAuthWrapper>
+          </SessionProvider>
+          {/* </AntdRegistry> */}
           <Toaster />
         </ThemeProvider>
       </body>

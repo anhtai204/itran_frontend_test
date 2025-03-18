@@ -43,7 +43,7 @@ const menuItems = [
         href: "/ecommerce",
       },
       {
-        title: "Mange User",
+        title: "Manage User",
         icon: UserCircle,
         href: "/dashboard/user",
       },
@@ -80,7 +80,7 @@ const menuItems = [
       {
         title: "Icons",
         icon: FileIcon,
-        href: "/icons",
+        href: "/",
       },
     ],
   },
@@ -90,12 +90,12 @@ const menuItems = [
       {
         title: "Forms",
         icon: File,
-        href: "/forms",
+        href: "/",
       },
       {
         title: "Tables",
         icon: Table,
-        href: "/tables",
+        href: "/dashboard/eroom",
       },
     ],
   },
@@ -105,22 +105,28 @@ const menuItems = [
       {
         title: "Authentication",
         icon: Lock,
-        href: "/auth",
+        href: "/",
       },
       {
         title: "User Profile",
         icon: UserCircle,
-        href: "/profile",
+        href: "/",
       },
       {
         title: "Timeline",
         icon: Clock,
-        href: "/timeline",
+        href: "/",
       },
       {
         title: "Post",
         icon: File,
-        href: "dashboard/post",
+        href: "/dashboard/post",
+        children: [
+          {
+            title: "Category",
+            href: "/dashboard/category",
+          },
+        ],
       },
     ],
   },
@@ -164,17 +170,34 @@ export function Sidebar() {
             <h4 className="mb-2 px-2 text-xs font-semibold text-muted-foreground">{section.title}</h4>
             <div className="space-y-1">
               {section.items.map((item, j) => (
-                <Link
-                  key={j}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-2 py-2 text-sm font-medium hover:bg-accent",
-                    pathname === item.href ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                <div key={j}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-2 py-2 text-sm font-medium hover:bg-accent",
+                      pathname === item.href ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.title}
+                  </Link>
+                  {item.children && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      {item.children.map((child, k) => (
+                        <Link
+                          key={k}
+                          href={child.href}
+                          className={cn(
+                            "block text-sm text-muted-foreground hover:text-accent-foreground",
+                            pathname === child.href ? "text-accent-foreground" : ""
+                          )}
+                        >
+                          {child.title}
+                        </Link>
+                      ))}
+                    </div>
                   )}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.title}
-                </Link>
+                </div>
               ))}
             </div>
           </div>

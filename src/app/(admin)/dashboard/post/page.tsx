@@ -1,9 +1,13 @@
+import { auth } from "@/auth";
 import PostsPage from "@/components/admin.post";
 
-const PostManage = () => {
+const PostManage = async () => {
+
+    const session  = await auth();
+
     return (
         <>
-            <PostsPage />
+            <PostsPage session={session} />
         </>
     )
 }
