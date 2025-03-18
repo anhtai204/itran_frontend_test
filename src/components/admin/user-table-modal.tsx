@@ -1,10 +1,22 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useState, useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,88 +26,114 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { handleDeleteUserAction, handleGetRoles, handleUpdateUserAction } from "@/utils/action"
-import UserCreateModal from "./user-create-modal"
-import { Pagination } from "@/components/ui/pagination"
-import { ChevronDown, Eye, Pencil, Trash } from "lucide-react"
-import { toast } from "sonner"
-import UserUpdateModal from "./user-update-modal"
-import UserDetailModal from "./user-detail-modal"
+} from "@/components/ui/alert-dialog";
+import {
+  handleDeleteUserAction,
+  handleGetRoles,
+  handleUpdateUserAction,
+} from "@/utils/action";
+import UserCreateModal from "./user-create-modal";
+import { Pagination } from "@/components/ui/pagination";
+import { ChevronDown, Eye, Pencil, Trash } from "lucide-react";
+import { toast } from "sonner";
+import UserUpdateModal from "./user-update-modal";
+import UserDetailModal from "./user-detail-modal";
+
+interface User {
+  id: string;
+  username: string;
+  email?: string;
+  phone?: string;
+  password_hash?: string;
+  address?: string;
+  full_name: string;
+  avatar_url?: string;
+  role_id?: number; // Không dùng foreign key, lưu ID trực tiếp
+  is_active?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
 
 interface IProps {
-  users: any[]
+  users: User[];
   meta: {
-    current: number
-    pageSize: number
-    pages: number
-    total: number
-  }
+    current: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+  };
 }
 
 const UserTableModal = (props: IProps) => {
-  const { users, meta } = props
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-  const { replace } = useRouter()
+  const { users, meta } = props;
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false)
-  const [dataUpdate, setDataUpdate] = useState<any>(null)
-  const [dataDetail, setDataDetail] = useState<any>(null)
-  const [userRoles, setUserRoles] = useState<{ [key: string]: number }>({})
-  const [rolesMap, setRolesMap] = useState<{ [key: number]: string }>({})
-  const [menuItems, setMenuItems] = useState<any[]>([])
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
-  const [userToDelete, setUserToDelete] = useState<string | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [dataUpdate, setDataUpdate] = useState<any>(null);
+  const [dataDetail, setDataDetail] = useState<any>(null);
+  const [userRoles, setUserRoles] = useState<{ [key: string]: number }>({});
+  const [rolesMap, setRolesMap] = useState<{ [key: number]: string }>({});
+  const [menuItems, setMenuItems] = useState<any[]>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRoles = async () => {
-      const items = await handleGetRoles()
-      setMenuItems(items)
-      const roleMap = items.reduce((acc: { [key: number]: string }, item: any) => {
-        acc[Number(item.key)] = item.label
-        return acc
-      }, {})
-      setRolesMap(roleMap)
-    }
-    fetchRoles()
-  }, [])
+      const items = await handleGetRoles();
+      setMenuItems(items);
+      const roleMap = items.reduce(
+        (acc: { [key: number]: string }, item: any) => {
+          acc[Number(item.key)] = item.label;
+          return acc;
+        },
+        {}
+      );
+      setRolesMap(roleMap);
+    };
+    fetchRoles();
+  }, []);
 
   const handleMenuClick = async (userId: string, role_id: number) => {
-    setUserRoles((prev) => ({ ...prev, [userId]: role_id }))
-    const res = await handleUpdateUserAction({ id: userId, role_id: role_id })
+    setUserRoles((prev) => ({ ...prev, [userId]: role_id }));
+    const res = await handleUpdateUserAction({ id: userId, role_id: role_id });
     if (res?.data) {
-      const currentRoleId = res?.data?.role_id
-      const currentRole = rolesMap[currentRoleId] || ""
-      toast.success(`Updated role ${currentRole} for ${res?.data?.email}`)
+      const currentRoleId = res?.data?.role_id;
+      const currentRole = rolesMap[currentRoleId] || "";
+      toast.success(`Updated role ${currentRole} for ${res?.data?.email}`);
     } else {
-      toast.error("Error while updating role")
+      toast.error("Error while updating role");
     }
-  }
+  };
 
   const handleDeleteUser = async (userId: string) => {
-    const res = await handleDeleteUserAction(userId)
+    const res = await handleDeleteUserAction(userId);
     if (res?.data) {
-      toast.success("User deleted successfully")
+      toast.success("User deleted successfully");
     } else {
-      toast.error("Error while deleting user")
+      toast.error("Error while deleting user");
     }
-    setDeleteConfirmOpen(false)
-  }
+    setDeleteConfirmOpen(false);
+  };
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams)
-    params.set("current", page.toString())
-    replace(`${pathname}?${params.toString()}`)
-  }
-
+    const params = new URLSearchParams(searchParams);
+    params.set("current", page.toString());
+    replace(`${pathname}?${params.toString()}`);
+  };
   return (
     <div className="space-y-4 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Users</h2>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-primary hover:bg-primary/90 text-white dark:text-black">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Manage Users
+        </h2>
+        <Button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-primary hover:bg-primary/90 text-white dark:text-black"
+        >
           Create User
         </Button>
       </div>
@@ -104,19 +142,32 @@ const UserTableModal = (props: IProps) => {
         <Table>
           <TableHeader className="bg-gray-50 dark:bg-gray-800">
             <TableRow className="border-b dark:border-gray-700">
-              <TableHead className="text-gray-700 dark:text-gray-300">STT</TableHead>
-              <TableHead className="text-gray-700 dark:text-gray-300">Email</TableHead>
-              <TableHead className="text-gray-700 dark:text-gray-300">Role</TableHead>
-              <TableHead className="text-gray-700 dark:text-gray-300">Actions</TableHead>
+              <TableHead className="text-gray-700 dark:text-gray-300">
+                STT
+              </TableHead>
+              <TableHead className="text-gray-700 dark:text-gray-300">
+                Email
+              </TableHead>
+              <TableHead className="text-gray-700 dark:text-gray-300">
+                Role
+              </TableHead>
+              <TableHead className="text-gray-700 dark:text-gray-300">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.map((user, index) => (
-              <TableRow key={user.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+              <TableRow
+                key={user.id}
+                className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
                 <TableCell className="text-gray-700 dark:text-gray-300">
                   {index + 1 + (meta.current - 1) * meta.pageSize}
                 </TableCell>
-                <TableCell className="text-gray-700 dark:text-gray-300">{user.email}</TableCell>
+                <TableCell className="text-gray-700 dark:text-gray-300">
+                  {user.email}
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -124,7 +175,8 @@ const UserTableModal = (props: IProps) => {
                         variant="outline"
                         className="w-full justify-start bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
                       >
-                        {rolesMap[userRoles[user.id] || user.role_id] || "Select Role"}
+                        {rolesMap[userRoles[user.id] || user.role_id] ||
+                          "Select Role"}
                         <ChevronDown className="ml-auto h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -132,7 +184,9 @@ const UserTableModal = (props: IProps) => {
                       {menuItems.map((item) => (
                         <DropdownMenuItem
                           key={item.key}
-                          onClick={() => handleMenuClick(user.id, Number(item.key))}
+                          onClick={() =>
+                            handleMenuClick(user.id, Number(item.key))
+                          }
                           className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           {item.label}
@@ -147,8 +201,8 @@ const UserTableModal = (props: IProps) => {
                       variant="outline"
                       size="icon"
                       onClick={() => {
-                        setIsDetailModalOpen(true)
-                        setDataDetail(user)
+                        setIsDetailModalOpen(true);
+                        setDataDetail(user);
                       }}
                       className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                     >
@@ -158,8 +212,8 @@ const UserTableModal = (props: IProps) => {
                       variant="outline"
                       size="icon"
                       onClick={() => {
-                        setIsUpdateModalOpen(true)
-                        setDataUpdate(user)
+                        setIsUpdateModalOpen(true);
+                        setDataUpdate(user);
                       }}
                       className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                     >
@@ -169,8 +223,8 @@ const UserTableModal = (props: IProps) => {
                       variant="outline"
                       size="icon"
                       onClick={() => {
-                        setUserToDelete(user.id)
-                        setDeleteConfirmOpen(true)
+                        setUserToDelete(user.id);
+                        setDeleteConfirmOpen(true);
                       }}
                       className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                     >
@@ -186,13 +240,21 @@ const UserTableModal = (props: IProps) => {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Showing {(meta.current - 1) * meta.pageSize + 1} to {Math.min(meta.current * meta.pageSize, meta.total)} of{" "}
-          {meta.total} entries
+          Showing {(meta.current - 1) * meta.pageSize + 1} to{" "}
+          {Math.min(meta.current * meta.pageSize, meta.total)} of {meta.total}{" "}
+          entries
         </p>
-        <Pagination currentPage={meta.current} totalPages={meta.pages} onPageChange={handlePageChange} />
+        <Pagination
+          currentPage={meta.current}
+          totalPages={meta.pages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
-      <UserCreateModal isCreateModalOpen={isCreateModalOpen} setIsCreateModalOpen={setIsCreateModalOpen} />
+      <UserCreateModal
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+      />
 
       <UserUpdateModal
         isUpdateModalOpen={isUpdateModalOpen}
@@ -215,7 +277,8 @@ const UserTableModal = (props: IProps) => {
               Are you sure you want to delete this user?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
-              This action cannot be undone. This will permanently delete the user account.
+              This action cannot be undone. This will permanently delete the
+              user account.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -232,8 +295,7 @@ const UserTableModal = (props: IProps) => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
-}
+  );
+};
 
 export default UserTableModal;
-

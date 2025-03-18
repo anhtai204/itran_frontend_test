@@ -114,7 +114,7 @@ export function CourseListItem({ course }: CourseProps) {
               </span>
             </div>
 
-            <Link href={`/courses/${course.slug}`}>
+            <Link href={`/course/${course.slug}`}>
               <Button className="rounded-full bg-gradient-to-r from-purple-600 to-indigo-500 hover:from-purple-700 hover:to-indigo-600">
                 View Course
               </Button>

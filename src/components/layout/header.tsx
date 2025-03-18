@@ -20,10 +20,10 @@ const Header = () => {
               Home
             </Link>
             <Link
-              href="/courses"
+              href="/course"
               className="text-sm font-medium dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
-              Courses
+              Course
             </Link>
 
             <Link
@@ -31,6 +31,12 @@ const Header = () => {
               className="text-sm font-medium dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
               Blogs
+            </Link>
+            <Link
+              href="/news"
+              className="text-sm font-medium dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            >
+              News
             </Link>
           </nav>
         </div>

@@ -9,43 +9,9 @@ import { FAQs } from "@/components/course/course-single/faqs";
 import { Reviews } from "@/components/course/course-single/reviews";
 import { CommentForm } from "@/components/course/course-single/component-form";
 
-import ani from "../../assets/images/ani.png";
-import ai from "../../assets/images/ai.webp";
-import doof from "../../assets/images/doof.jpg";
-import earth from "../../assets/images/earth.png";
-import hnue from "../../assets/images/hnue.jpg";
-import meme from "../../assets/images/meme.jpg";
-import meme1 from "../../assets/images/meme1.jpg";
-
-import ai1 from "../../assets/images/ai1.jpg";
-import ai2 from "../../assets/images/ai2.jpg";
-import ai3 from "../../assets/images/ai3.jpg";
-import ai4 from "../../assets/images/ai4.jpg";
-import ai5 from "../../assets/images/ai5.jpg";
-import ai6 from "../../assets/images/ai6.png";
-import ai7 from "../../assets/images/ai7.png";
-import ai8 from "../../assets/images/ai8.webp";
-import ai9 from "../../assets/images/ai9.webp";
 import Image from "next/image";
 
 const CourseDetail = () => {
-  const images = [
-    ai1,
-    ai2,
-    ai3,
-    ai4,
-    ai5,
-    ai6,
-    ai7,
-    ai8,
-    ai9,
-    ani,
-    ai,
-    doof,
-    earth,
-    hnue,
-    meme,
-  ];
   const [activeTab, setActiveTab] = useState("overview");
 
   const courseMetadata = {
@@ -56,7 +22,7 @@ const CourseDetail = () => {
     quizzes: "3 Quizzes",
     sections: [
       {
-        title: "Lessons With Video Content",
+        title: "Chapter With Video Content",
         totalLessons: 5,
         totalDuration: "45 Mins",
         lessons: [
@@ -219,17 +185,17 @@ const CourseDetail = () => {
         <div className="max-w-5xl container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="space-y-4">
-              <div className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-sm">
+              <div className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs">
                 <span>Photography</span>
                 <span className="mx-2 text-gray-300">by</span>
                 <span>Determined-Poitras</span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold">
+              <h1 className="text-1xl md:text-2xl font-bold">
                 The Ultimate Guide To The Best LMS Plugin
               </h1>
 
-              <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+              <div className="flex flex-wrap gap-4 text-xs text-gray-300">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>{courseMetadata.duration}</span>
@@ -256,7 +222,7 @@ const CourseDetail = () => {
             <div className="flex justify-end">
               <div className="relative">
                 <Image
-                  src={images[0]}
+                  src={"./assets/images/ani.png"}
                   alt="Course Preview"
                   className="rounded-xl"
                   width={400}

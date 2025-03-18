@@ -21,36 +21,10 @@ import {
 } from "@/components/ui/accordion";
 import { CourseCard } from "@/components/course/course-listing/course-card";
 import { CourseListItem } from "@/components/course/course-listing/course-list-item";
-
-import ani from "@/assets/images/ani.png";
-import ai from "@/assets/images/ai.webp";
-import doof from "@/assets/images/doof.jpg";
-import earth from "@/assets/images/earth.png";
-import hnue from "@/assets/images/hnue.jpg";
-import meme from "@/assets/images/meme.jpg";
-import meme1 from "@/assets/images/meme1.jpg";
-
-import ai1 from "@/assets/images/ai1.jpg";
-import ai2 from "@/assets/images/ai2.jpg";
-import ai3 from "@/assets/images/ai3.jpg";
-import ai4 from "@/assets/images/ai4.jpg";
-import ai5 from "@/assets/images/ai5.jpg";
-import ai6 from "@/assets/images/ai6.png";
-import ai7 from "@/assets/images/ai7.png";
-import ai8 from "@/assets/images/ai8.webp";
-import ai9 from "@/assets/images/ai9.webp";
+import { Pagination } from "../ui/pagination";
 
 // Sample data
-const categories = [
-  { id: "web-development", name: "Web Development", count: 42 },
-  { id: "design", name: "Design", count: 36 },
-  { id: "marketing", name: "Marketing", count: 28 },
-  { id: "business", name: "Business", count: 24 },
-  { id: "photography", name: "Photography", count: 18 },
-  { id: "music", name: "Music", count: 15 },
-];
-
-const instructors = [
+const teachers = [
   { id: "john-doe", name: "John Doe", count: 12 },
   { id: "jane-smith", name: "Jane Smith", count: 10 },
   { id: "robert-johnson", name: "Robert Johnson", count: 8 },
@@ -65,120 +39,52 @@ const levels = [
   { id: "all-levels", name: "All Levels", count: 24 },
 ];
 
-const courses = [
-  {
-    id: 1,
-    slug: "wordpress-lms-plugin",
-    title: "The Ultimate Guide To The Best WordPress LMS Plugin",
-    instructor: "John Doe",
-    price: 49.99,
-    originalPrice: 69.99,
-    rating: 4.8,
-    reviewCount: 124,
-    level: "All Levels",
-    category: "Web Development",
-    image: ai1,
-    featured: true,
-  },
-  {
-    id: 2,
-    slug: "javascript-fundamentals",
-    title: "JavaScript Fundamentals: From Zero to Hero",
-    instructor: "Jane Smith",
-    price: 39.99,
-    originalPrice: 59.99,
-    rating: 4.6,
-    reviewCount: 98,
-    level: "Beginner",
-    category: "Web Development",
-    image: ai2,
-  },
-  {
-    id: 3,
-    slug: "ui-ux-design",
-    title: "UI/UX Design Masterclass: Create Beautiful Interfaces",
-    instructor: "Emily Davis",
-    price: 59.99,
-    originalPrice: 79.99,
-    rating: 4.9,
-    reviewCount: 156,
-    level: "Intermediate",
-    category: "Design",
-    image: ai3,
-  },
-  {
-    id: 4,
-    slug: "digital-marketing",
-    title: "Digital Marketing: Complete Guide to Growing Your Business",
-    instructor: "Robert Johnson",
-    price: 49.99,
-    originalPrice: 69.99,
-    rating: 4.7,
-    reviewCount: 112,
-    level: "All Levels",
-    category: "Marketing",
-    image: ai4,
-  },
-  {
-    id: 5,
-    slug: "photography-basics",
-    title: "Photography Basics: Composition and Lighting",
-    instructor: "Michael Wilson",
-    price: 29.99,
-    originalPrice: 49.99,
-    rating: 4.5,
-    reviewCount: 87,
-    level: "Beginner",
-    category: "Photography",
-    image: ai,
-  },
-  {
-    id: 6,
-    slug: "business-strategy",
-    title: "Business Strategy: Plan, Execute, and Grow",
-    instructor: "John Doe",
-    price: 69.99,
-    originalPrice: 89.99,
-    rating: 4.8,
-    reviewCount: 134,
-    level: "Advanced",
-    category: "Business",
-    image: ai5,
-  },
-  {
-    id: 7,
-    slug: "react-advanced",
-    title: "Advanced React: Build Complex Applications",
-    instructor: "Jane Smith",
-    price: 59.99,
-    originalPrice: 79.99,
-    rating: 4.9,
-    reviewCount: 145,
-    level: "Advanced",
-    category: "Web Development",
-    image: ai6,
-  },
-  {
-    id: 8,
-    slug: "graphic-design",
-    title: "Graphic Design Principles for Non-Designers",
-    instructor: "Emily Davis",
-    price: 39.99,
-    originalPrice: 59.99,
-    rating: 4.7,
-    reviewCount: 102,
-    level: "Beginner",
-    category: "Design",
-    image: ai7,
-  },
-];
+interface Course {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail_url?: string;
+  teacher_id?: string;
+  category_id?: string;
+  status?: string;
+  price?: number;
+  duration?: number;
+  slug: string;
+  assistants_id?: string[];
+  original_price?: number;
+  featured?: boolean;
+  level_id?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
 
-export function CourseListing() {
+interface CourseCategory {
+  id: string;
+  name: string;
+  description?: string;
+  count: number;
+}
+
+interface IProps {
+  courses: Course[];
+  course_categories: CourseCategory[];
+  courses_meta: {
+    current: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+  };
+}
+
+export function CourseListing(props: IProps) {
+  const { courses, course_categories, courses_meta } = props;
+  console.log(courses, course_categories, courses_meta);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [priceRange, setPriceRange] = useState([0, 100]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedInstructors, setSelectedInstructors] = useState<string[]>([]);
+  const [selectedteachers, setSelectedteachers] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState("popular");
@@ -194,7 +100,7 @@ export function CourseListing() {
 
   // Toggle instructor selection
   const toggleInstructor = (instructorId: string) => {
-    setSelectedInstructors((prev) =>
+    setSelectedteachers((prev) =>
       prev.includes(instructorId)
         ? prev.filter((id) => id !== instructorId)
         : [...prev, instructorId]
@@ -204,7 +110,7 @@ export function CourseListing() {
   // Clear all filters
   const clearFilters = () => {
     setSelectedCategories([]);
-    setSelectedInstructors([]);
+    setSelectedteachers([]);
     setPriceRange([0, 100]);
     setSelectedRating(null);
     setSelectedLevel(null);
@@ -213,7 +119,7 @@ export function CourseListing() {
   // Count active filters
   const activeFilterCount =
     selectedCategories.length +
-    selectedInstructors.length +
+    selectedteachers.length +
     (selectedRating ? 1 : 0) +
     (selectedLevel ? 1 : 0) +
     (priceRange[0] > 0 || priceRange[1] < 100 ? 1 : 0);
@@ -355,7 +261,7 @@ export function CourseListing() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-2 pt-2">
-                    {categories.map((category) => (
+                    {course_categories.map((category) => (
                       <div
                         key={category.id}
                         className="flex items-center space-x-2"
@@ -386,18 +292,18 @@ export function CourseListing() {
                 className="border-b border-gray-200 dark:border-gray-700"
               >
                 <AccordionTrigger className="text-base font-medium py-2">
-                  Instructors
+                  Teachers
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-2 pt-2">
-                    {instructors.map((instructor) => (
+                    {teachers.map((instructor) => (
                       <div
                         key={instructor.id}
                         className="flex items-center space-x-2"
                       >
                         <Checkbox
                           id={`instructor-${instructor.id}`}
-                          checked={selectedInstructors.includes(instructor.id)}
+                          checked={selectedteachers.includes(instructor.id)}
                           onCheckedChange={() =>
                             toggleInstructor(instructor.id)
                           }
@@ -557,8 +463,7 @@ export function CourseListing() {
             <div className="hidden lg:flex justify-between items-center mb-6">
               <div>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Showing <span className="font-medium">{courses.length}</span>{" "}
-                  results
+                  Showing <span className="font-medium">{1}</span> results
                 </p>
               </div>
 
@@ -613,7 +518,9 @@ export function CourseListing() {
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {selectedCategories.map((categoryId) => {
-                  const category = categories.find((c) => c.id === categoryId);
+                  const category = course_categories.find(
+                    (c) => c.id === categoryId
+                  );
                   return category ? (
                     <div
                       key={categoryId}
@@ -632,8 +539,8 @@ export function CourseListing() {
                   ) : null;
                 })}
 
-                {selectedInstructors.map((instructorId) => {
-                  const instructor = instructors.find(
+                {selectedteachers.map((instructorId) => {
+                  const instructor = teachers.find(
                     (i) => i.id === instructorId
                   );
                   return instructor ? (
@@ -718,6 +625,7 @@ export function CourseListing() {
             )}
 
             {/* Pagination */}
+
             <div className="mt-12 flex justify-center">
               <div className="flex items-center space-x-2">
                 <Button
