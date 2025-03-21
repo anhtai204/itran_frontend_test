@@ -71,7 +71,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       (session.user as IUser) = token.user;
       return session;
     },
-    authorized: async ({ auth }) => {
+    // authorized: async ({ auth }) => {
+    //   return !!auth;
+    // },
+    authorized: async ({ auth, request }) => {
+      const { pathname } = request.nextUrl;
+      // Cho phép truy cập public cho các route và sub-route
+      if (
+        pathname === "/" ||
+        pathname.startsWith("/course") ||
+        pathname.startsWith("/blog") ||
+        pathname.startsWith("/news")
+      ) {
+        return true;
+      }
+      // Yêu cầu session cho các route khác
       return !!auth;
     },
   },

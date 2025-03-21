@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PostEditor } from "@/components/post-editor";
+import { PostEditor } from "@/components/post/post-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +16,10 @@ import {
   MessageSquare,
   Bell,
 } from "lucide-react";
-import { FileUploadArea } from "@/components/file-upload-area";
+import { FileUploadArea } from "@/components/post/file-upload-area";
 import { handleGetCategories, handleCreatePost } from "@/utils/action";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { toast } from "sonner";
-import { auth } from "@/auth";
-import { useSession } from "next-auth/react";
 
 export default function PostsPage(props: any) {
 
@@ -132,31 +130,18 @@ export default function PostsPage(props: any) {
       created_at: isPublished ? new Date().toISOString() : null,
     };
 
-    // console.log('>>>author_id: ', session?.user?.id)
-    // console.log(">>>categoryIds: ", selectedCategories);
-    // console.log(">>>title: ", title);
-    // console.log(">>>description: ", description);
-    // console.log(">>>excerpt: ", excerpt);
-    // console.log(">>>post_status: ",isDraft ? "draft" : isPublished ? "published" : "draft");
-    // console.log(">>>allow_comments: ", allowComments);
-    // console.log(">>>receive_notifications: ", receiveNotifications);
-    // console.log(">>>tags: ", tags);
-    // console.log(">>>content: ", JSON.stringify(blocks[0].content));
-    // console.log('>>>published_at: ', isPublished ? new Date().toISOString() : null);
-    // console.log(">>>published_at: ", new Date().toISOString());
-
     console.log('>>postData: ', postData);
 
     try {
-      // const { title, content, description, excerpt, post_status, slug, categories_id, author_id, visibility, comment_status, ping_status, created_at } = postData;
       const response = await handleCreatePost(postData)
       if (response.statusCode === 201) {
         // Show success message and redirect
         console.log("Post created successfully:", response.data)
+        toast("Post created successfully!");
         // Redirect to post list or view
       } else {
         // Show error message
-        console.error("Failed to create post:", response.message)
+        toast("Post already exist or failed to create");
       }
     } catch (error) {
       console.error("Error creating post:", error)
@@ -168,20 +153,20 @@ export default function PostsPage(props: any) {
     return <div className="p-6">Loading post editor...</div>;
   }
 
-  const showContent = () => {
-    console.log(">>>title: ", title);
-    console.log(">>>description: ", description);
-    console.log(">>>excerpt: ", excerpt);
-    console.log(">>>visibility: ", visibility);
-    console.log(">>>isPublished: ", isPublished);
-    console.log(">>>allowComments: ", allowComments);
-    console.log(">>>receiveNotifications: ", receiveNotifications);
-    console.log(">>>tags: ", tags);
-    console.log(">>>slug: ", slug);
-    console.log(">>>date: ", date);
-    console.log(">>>featured_image: ", featuredImage);
-    console.log(">>>block: ", blocks[0].content);
-  };
+  // const showContent = () => {
+  //   console.log(">>>title: ", title);
+  //   console.log(">>>description: ", description);
+  //   console.log(">>>excerpt: ", excerpt);
+  //   console.log(">>>visibility: ", visibility);
+  //   console.log(">>>isPublished: ", isPublished);
+  //   console.log(">>>allowComments: ", allowComments);
+  //   console.log(">>>receiveNotifications: ", receiveNotifications);
+  //   console.log(">>>tags: ", tags);
+  //   console.log(">>>slug: ", slug);
+  //   console.log(">>>date: ", date);
+  //   console.log(">>>featured_image: ", featuredImage);
+  //   console.log(">>>block: ", blocks[0].content);
+  // };
 
   return (
     <div className="flex min-h-screen">

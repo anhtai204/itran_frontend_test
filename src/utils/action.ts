@@ -34,6 +34,23 @@ export async function authenticate(username: string, password: string) {
   }
 }
 
+// Hàm lấy tất cả users từ API
+export const getUsers = async () => {
+  const session = await auth();
+  const res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+  });
+
+  if (res.statusCode === 200 && Array.isArray(res.data)) {
+    return res.data;
+  }
+  return [];
+};
+
 export const handleCreateUserAction = async (data: any) => {
   const session = await auth();
   const res = await sendRequest<IBackendRes<any>>({
@@ -238,6 +255,21 @@ export const handleCreateCategory = async (data: any) => {
   }
 };
 
+export const handleUpdateCategory = async (id: string) => {
+  const session = await auth();
+  const res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories/${id}`,
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+    body: {},
+  });
+
+  revalidateTag("categories");
+  return res;
+};
+
 export const handleDeleteCategory = async (id: string) => {
   const session = await auth();
   const res = await sendRequest<IBackendRes<any>>({
@@ -252,12 +284,23 @@ export const handleDeleteCategory = async (id: string) => {
   return res;
 };
 
-
-
 export const handleCreatePost = async (data: any) => {
   const session = await auth();
 
-  const { title, content, description, excerpt, post_status, slug, categories_id, author_id, visibility, comment_status, ping_status, create_at } = data;
+  const {
+    title,
+    content,
+    description,
+    excerpt,
+    post_status,
+    slug,
+    categories_id,
+    author_id,
+    visibility,
+    comment_status,
+    ping_status,
+    create_at,
+  } = data;
 
   try {
     const res = await sendRequest<IBackendRes<any>>({
@@ -278,7 +321,7 @@ export const handleCreatePost = async (data: any) => {
         visibility,
         comment_status,
         ping_status,
-        create_at
+        create_at,
       },
     });
 
@@ -289,8 +332,6 @@ export const handleCreatePost = async (data: any) => {
     throw error;
   }
 };
-
-
 
 export const handleGetTags = async () => {
   const session = await auth();
@@ -315,4 +356,54 @@ export const handleGetTags = async () => {
     console.error("Error fetching categories:", error);
     throw error;
   }
+};
+
+export const handleGetPostBySlug = async (slug: string) => {
+  try {
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/${slug}`,
+      method: "GET",
+    });
+
+    if (res.statusCode === 200 && Array.isArray(res.data)) {
+      return res.data;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+export interface RawPost {
+  id: string;
+  title: string;
+  author: string;
+  create_at: Date;
+  content: string;
+  excerpt: string | null;
+  description: string;
+  post_status: string;
+  visibility: string;
+  comment_status: boolean;
+  ping_status: boolean;
+  slug: string;
+  categories: string[];
+  feature_image: string;
+}
+
+export const handleGetCustomPost = async (): Promise<RawPost[]> => {
+  const session = await auth();
+  const res = await sendRequest<IBackendRes<RawPost[]>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/custom`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+  });
+
+  if (res.statusCode === 200 && Array.isArray(res.data)) {
+    return res.data;
+  }
+  return [];
 };

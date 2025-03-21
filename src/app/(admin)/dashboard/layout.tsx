@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import { Sidebar } from "@/components/admin.sidebar";
 import AdminContent from "@/components/admin.content";
 import Header from "@/components/admin.header";
+import { Sidebar } from "@/components/admin.sidebar";
 
 const AdminLayout = async ({
   children,

@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import PostsPage from "@/components/admin.post";
+import PostsPage from "@/components/post/admin.post";
 
 const PostManage = async () => {
 

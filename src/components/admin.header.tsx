@@ -10,8 +10,10 @@ import Image from "next/image";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { signOut } from "next-auth/react";
 
+
 const Header = (props: any) => {
   const {session} = props;
+  
   console.log('>>> check session header: ', session);
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -60,7 +62,7 @@ const Header = (props: any) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem>{session?.user?.username ?? ""}</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => signOut()}>
+              <DropdownMenuItem onClick={() => signOut({redirectTo: '/'})}>
                   Đăng xuất
               </DropdownMenuItem>
             </DropdownMenuContent>

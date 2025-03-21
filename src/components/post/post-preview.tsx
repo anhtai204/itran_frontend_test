@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import "katex/dist/katex.min.css"
 import katex from "katex"
+import DOMPurify from 'dompurify';
 
 interface Block {
   id: string
@@ -33,16 +34,6 @@ export function PostPreview({
   receiveNotifications = true,
 }: PostPreviewProps) {
   const [mounted, setMounted] = useState(false)
-
-  console.log('>>>title preview: ', title);
-  console.log('>>>description preview: ', description);
-  console.log('>>>excerpt preview: ', excerpt);
-  console.log('>>>blocks preview: ', blocks);
-  console.log('>>>featuredImage preview: ', featuredImage);
-  console.log('>>>allowComments preview: ', allowComments);
-  console.log('>>>receiveNotifications preview: ', receiveNotifications);
-
-
 
   useEffect(() => {
     setMounted(true)
@@ -157,7 +148,7 @@ function renderBlockPreview(block: Block) {
       return (
         <div
           dangerouslySetInnerHTML={{
-            __html: renderKatex(block.content) || "<p>Empty text block</p>",
+            __html:  DOMPurify.sanitize(renderKatex(block.content)) || "<p>Empty text block</p>",
             // __html: katex.renderToString("c = \\pm\\sqrt{a^2 + b^2}")
           }}
         />
@@ -233,9 +224,9 @@ function renderBlockPreview(block: Block) {
         <div
           className="my-4"
           dangerouslySetInnerHTML={{
-            __html: katex.renderToString(block.content || "Empty formula", {
+            __html: DOMPurify.sanitize(katex.renderToString(block.content || "Empty formula", {
               throwOnError: false,
-            }),
+            })),
           }}
         />
       )

@@ -110,7 +110,7 @@ const UserHeader = (props: any) => {
           </DropdownMenuItem>
           <DropdownMenuItem 
             className="text-destructive focus:text-destructive" 
-            onClick={() => signOut()}
+            onClick={() => signOut({ redirectTo: "/" })}
           >
             Đăng xuất
           </DropdownMenuItem>

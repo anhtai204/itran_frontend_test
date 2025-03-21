@@ -10,9 +10,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { FileUploadArea } from "./file-upload-area"
-import Tiptap from "./tiptap"
+import Tiptap from "../tiptap"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PostPreview } from "./post-preview"
+import { PostPreview } from "./post-preview" 
 
 // Block types
 type BlockType = "text" | "image" | "code" | "video" | "list"
