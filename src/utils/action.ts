@@ -114,69 +114,6 @@ export const handleGetRoles = async () => {
   return [];
 };
 
-// export const handleGetCategories = async () => {
-//   const session = await auth();
-//   const res = await sendRequest<IBackendRes<any>>({
-//     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories`,
-//     method: "GET",
-//     headers: {
-//       Authorization: `Bearer ${session?.user?.access_token}`,
-//     },
-//   });
-
-//   if (res.statusCode === 200 && Array.isArray(res.data)) {
-//     const items = res.data.map((category) => ({
-//       label: category.name, // Gán label từ name
-//       key: category.id, // Gán key từ id
-//     }));
-//     return items;
-//   }
-//   return [];
-// };
-
-// export const handleCreateCategory = async (data: any) => {
-//   const session = await auth();
-
-//   // Create a copy of the data to modify
-//   const requestData = { ...data };
-
-//   // If parent_id is "none" or empty string, set it to null
-//   if (requestData.parent_id === "none" || requestData.parent_id === "") {
-//     requestData.parent_id = null;
-//   }
-
-//   const res = await sendRequest<IBackendRes<any>>({
-//     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories`,
-//     method: "POST",
-//     headers: {
-//       Authorization: `Bearer ${session?.user?.access_token}`,
-//     },
-//     body: {
-//       name: requestData.name,
-//       description: requestData.description,
-//       slug: requestData.slug,
-//       parent_id: requestData.parent_id, // Assuming the API accepts parent_ids as an array
-//     },
-//   });
-
-//   revalidateTag("categories");
-//   return res;
-// };
-
-// export const handleDeleteCategory = async (id: string) => {
-//   const session = await auth();
-//   const res = await sendRequest<IBackendRes<any>>({
-//     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories/${id}`,
-//     method: "DELETE",
-//     headers: {
-//       Authorization: `Bearer ${session?.user?.access_token}`,
-//     },
-//   });
-
-//   revalidateTag("categories");
-//   return res;
-// };
-
 export const handleGetCategories = async () => {
   const session = await auth();
   try {
@@ -255,15 +192,30 @@ export const handleCreateCategory = async (data: any) => {
   }
 };
 
-export const handleUpdateCategory = async (id: string) => {
+interface UpdateCategory {
+  name: string;
+  slug: string;
+  description: string;
+  parent_id: string;
+}
+
+export const handleUpdateCategory = async (
+  id: string,
+  data: UpdateCategory
+) => {
   const session = await auth();
   const res = await sendRequest<IBackendRes<any>>({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories/${id}`,
-    method: "DELETE",
+    method: "PATCH",
     headers: {
       Authorization: `Bearer ${session?.user?.access_token}`,
     },
-    body: {},
+    body: {
+      name: data.name,
+      slug: data.slug,
+      description: data.description,
+      parent_id: data.parent_id,
+    },
   });
 
   revalidateTag("categories");
@@ -287,75 +239,70 @@ export const handleDeleteCategory = async (id: string) => {
 export const handleCreatePost = async (data: any) => {
   const session = await auth();
 
-  const {
-    title,
-    content,
-    description,
-    excerpt,
-    post_status,
-    slug,
-    categories_id,
-    author_id,
-    visibility,
-    comment_status,
-    ping_status,
-    create_at,
-  } = data;
+  // Tạo một bản sao của dữ liệu để xử lý
+  const postData = { ...data };
 
+  
+  if (!Array.isArray(postData.blocks_data)) {
+    console.error("blocks_data must be an array");
+    throw new Error("blocks_data must be an array");
+  }
+  
+  
   try {
     const res = await sendRequest<IBackendRes<any>>({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts`,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/create`,
       method: "POST",
       headers: {
         Authorization: `Bearer ${session?.user?.access_token}`,
       },
-      body: {
-        title,
-        content,
-        description,
-        excerpt,
-        post_status,
-        slug,
-        categories_id,
-        author_id,
-        visibility,
-        comment_status,
-        ping_status,
-        create_at,
-      },
+      body: postData,
     });
 
-    revalidateTag("categories");
+    revalidateTag("list-posts");
     return res;
   } catch (error) {
-    console.error("Error creating category:", error);
+    console.error("Error creating post:", error);
     throw error;
   }
 };
 
-export const handleGetTags = async () => {
+export const handleUpdatePost = async (data: any) => {
   const session = await auth();
+
+  // Tạo một bản sao của dữ liệu để xử lý
+  const postData = { ...data };
+  
   try {
     const res = await sendRequest<IBackendRes<any>>({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/categories/post-tags`,
-      method: "GET",
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/update`,
+      method: "PATCH",
       headers: {
         Authorization: `Bearer ${session?.user?.access_token}`,
       },
+      body: postData,
     });
 
-    if (res.statusCode === 200 && Array.isArray(res.data)) {
-      const items = res.data.map((tag) => ({
-        label: tag.name, // Gán label từ name
-        key: tag.id, // Gán key từ id
-      }));
-      return items;
-    }
-    return [];
+    revalidateTag("list-posts");
+    return res;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error creating post:", error);
     throw error;
   }
+};
+
+export const handleDeletePost = async (id: string) => {
+  const session = await auth();
+  const res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/delete/${id}`,
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+  });
+
+  revalidateTag("list-posts");
+  return res;
 };
 
 export const handleGetPostBySlug = async (slug: string) => {
@@ -390,6 +337,7 @@ export interface RawPost {
   slug: string;
   categories: string[];
   feature_image: string;
+  scheduled_at: string;
 }
 
 export const handleGetCustomPost = async (): Promise<RawPost[]> => {
@@ -406,4 +354,72 @@ export const handleGetCustomPost = async (): Promise<RawPost[]> => {
     return res.data;
   }
   return [];
+};
+
+export const handleDeleteTagAction = async (id: any) => {
+  const session = await auth();
+  console.log(id);
+  const res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/post-tags/${id}`,
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+  });
+
+  revalidateTag("list-tags");
+  return res;
+};
+
+export const handleCreateTagAction = async (data: any) => {
+  const session = await auth();
+  const res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/post-tags`,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+    body: { ...data },
+  });
+  revalidateTag("list-tags");
+  return res;
+};
+
+export const handleUpdateTagAction = async (data: any) => {
+  const session = await auth();
+  const res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/post-tags`,
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+    body: { ...data },
+  });
+  revalidateTag("list-tags");
+  return res;
+};
+
+export const handleGetTags = async () => {
+  const session = await auth();
+  try {
+    const res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/post-tags`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${session?.user?.access_token}`,
+      },
+    });
+
+    if (res.statusCode === 200 && Array.isArray(res.data)) {
+      const items = res.data.map((category) => ({
+        label: category.name, // Gán label từ name
+        key: category.id, // Gán key từ id
+      }));
+      return items;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
 };

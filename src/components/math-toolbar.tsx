@@ -188,7 +188,7 @@ export function MathToolbar({ editor }: MathToolbarProps) {
             </TooltipContent>
           </Tooltip>
 
-          <Tooltip>
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <Button 
                 variant="outline" 
@@ -203,7 +203,7 @@ export function MathToolbar({ editor }: MathToolbarProps) {
             <TooltipContent>
               <p>Insert block math formula</p>
             </TooltipContent>
-          </Tooltip>
+          </Tooltip> */}
         </div>
 
         {/* Inline Math Symbols */}

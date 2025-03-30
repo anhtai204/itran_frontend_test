@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import PostsPage from "@/components/post/admin.post";
+import CreatePostsPage from "@/components/post/create-post-test";
 
 const PostManage = async () => {
 
@@ -7,7 +7,7 @@ const PostManage = async () => {
 
     return (
         <>
-            <PostsPage session={session} />
+            <CreatePostsPage session={session} />
         </>
     )
 }

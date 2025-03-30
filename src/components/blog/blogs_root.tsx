@@ -69,11 +69,10 @@ const featuredPost_fake = {
   slug: "df-sdf",
   title: "UK minister in US to pitch Britain as global AI investment hub",
   visibility: "public",
-  scheduled_at: '',
+  scheduled_at: '2025-03-26T03:34:02.682Z'
 };
 
 interface Category {
-  id: string;
   name: string;
   count: number;
 }
@@ -92,9 +91,6 @@ const BlogMain = (props: IProps) => {
   const { initialPosts, initialMeta, categories } = props;
   const [posts, setPosts] = useState(initialPosts);
   const [meta, setMeta] = useState(initialMeta);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [featuredPost, setFeaturedPost] = useState<RawPost>(featuredPost_fake);
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -105,49 +101,20 @@ const BlogMain = (props: IProps) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      try {
-        // Nếu có selectedCategoryId, dùng endpoint với category; nếu không, dùng endpoint mặc định
-        const categoryPath = selectedCategoryId || '';
-        const url = categoryPath
-          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/custom/category/${categoryPath}`
-          : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/custom`;
-        const res = await sendRequest<IBackendRes<any>>({
-          url,
-          method: "GET",
-          queryParams: {
-            current,
-            pageSize,
-            search: searchQuery || undefined,
-          },
-        });
-
-        if (res.statusCode === 200) {
-          console.log('>>>res: ', res);
-          setPosts(res.data.results || []);
-          setMeta(res.data.meta);
-        } else {
-          console.error('Failed to fetch posts:', res.message);
-          setPosts([]);
-          setMeta({ current: 1, pageSize: 6, pages: 0, total: 0 });
-        }
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-        setPosts([]);
-        setMeta({ current: 1, pageSize: 6, pages: 0, total: 0 });
+      const res = await sendRequest<IBackendRes<any>>({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/custom`,
+        method: "GET",
+        queryParams: { current, pageSize },
+      });
+      if (res.statusCode === 200) {
+        setPosts(res.data.results || []);
+        setMeta(res.data.meta);
       }
     };
-    fetchPosts();
-  }, [current, pageSize, selectedCategoryId, searchQuery]);
-
-  useEffect(() => {
-    const feature_post = getPostWithMostCategories(posts);
-    if (feature_post) {
-      setFeaturedPost({
-        ...feature_post,
-        create_at: new Date(feature_post.create_at),
-      });
+    if (current !== meta.current) {
+      fetchPosts();
     }
-  }, [posts]);
+  }, [current, pageSize]);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams);
@@ -155,7 +122,46 @@ const BlogMain = (props: IProps) => {
     replace(`${pathname}?${params.toString()}`);
   };
 
-  console.log('>>>pageSize: ', pageSize);
+  // console.log(">>>categories", categories);
+  console.log(">>>posts: ", posts);
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [featuredPost, setFeaturedPost] = useState<RawPost>(featuredPost_fake);
+
+  // const feature_post = getPostWithMostCategories(posts);
+  // if (featuredPost !== null) {
+  //   setFeaturedPost(feature_post);
+  // }
+
+  useEffect(() => {
+    const feature_post = getPostWithMostCategories(posts);
+
+    if (feature_post) {
+      setFeaturedPost({
+        ...feature_post,
+        create_at: new Date(feature_post.create_at), // Ép kiểu Date
+      });
+    }
+  }, [posts]);
+
+  console.log(">>>feature post: ", getPostWithMostCategories(posts));
+
+  // Filter posts based on selected category and search query
+  const filteredPosts = posts.filter((post: any) => {
+    const matchesCategory =
+      selectedCategory === "All" ||
+      (Array.isArray(post.categories) &&
+        post.categories.some(
+          (category: string) =>
+            category.trim().toLowerCase() ===
+            selectedCategory.trim().toLowerCase()
+        ));
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <>
@@ -163,8 +169,10 @@ const BlogMain = (props: IProps) => {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Blog</h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
-            Insights, tips, and resources to help you succeed in your educational journey
+            Insights, tips, and resources to help you succeed in your
+            educational journey
           </p>
+
           <div className="max-w-2xl mx-auto relative">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -182,30 +190,22 @@ const BlogMain = (props: IProps) => {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="max-w-4xl container mx-auto px-4 py-12">
         {/* Categories */}
         <div className="flex flex-wrap gap-2 mb-8 justify-center">
-          {/* <Button
-            variant={selectedCategoryId === null ? "default" : "outline"}
-            className={`rounded-full ${
-              selectedCategoryId === null
-                ? "bg-gradient-to-r from-purple-600 to-indigo-500"
-                : ""
-            }`}
-            onClick={() => setSelectedCategoryId(null)}
-          >
-            All ({categories.reduce((sum, cat) => sum + cat.count, 0)})
-          </Button> */}
           {categories.map((category: Category) => (
             <Button
-              key={category.id}
-              variant={selectedCategoryId === category.id ? "default" : "outline"}
+              key={category.name}
+              variant={
+                selectedCategory === category.name ? "default" : "outline"
+              }
               className={`rounded-full ${
-                selectedCategoryId === category.id
+                selectedCategory === category.name
                   ? "bg-gradient-to-r from-purple-600 to-indigo-500"
                   : ""
               }`}
-              onClick={() => setSelectedCategoryId(category.id)}
+              onClick={() => setSelectedCategory(category.name)}
             >
               {category.name} ({category.count})
             </Button>
@@ -220,7 +220,8 @@ const BlogMain = (props: IProps) => {
                 <div className="relative h-60 md:h-auto">
                   <Image
                     src={
-                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/${featuredPost.feature_image}` || ai6
+                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/${featuredPost.feature_image}` ||
+                      ai6
                     }
                     width={700}
                     height={500}
@@ -265,10 +266,12 @@ const BlogMain = (props: IProps) => {
                     <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-1" />
+                        {/* <span>{featuredPost.publishedAt}</span> */}
                         <span>{"01 Jan 2024"}</span>
                       </div>
                       <div className="flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
+                        {/* <span>{featuredPost.readTime}</span> */}
                         <span>{"10 min read"}</span>
                       </div>
                     </div>
@@ -284,36 +287,65 @@ const BlogMain = (props: IProps) => {
 
         {/* Blog Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.length > 0 ? (
-            posts.map((post: any, index: number) => (
-              <BlogCard key={`${post.id}-${index}`} post={post} />
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                No articles found
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Try adjusting your search or filter to find what you're looking for.
-              </p>
-              <Button
-                className="mt-4 rounded-full"
-                onClick={() => {
-                  setSelectedCategoryId(null);
-                  setSearchQuery("");
-                }}
-              >
-                Clear Filters
-              </Button>
-            </div>
-          )}
+          {filteredPosts.map((post: any, index: number) => (
+            <BlogCard key={`${post.id}-${index}`} post={post} />
+          ))}
         </div>
 
         {/* Pagination */}
+        {/* {filteredPosts.length > 0 ? (
+          <div className="mt-12 flex justify-center">
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                className="w-10 h-10 p-0 rounded-full"
+                disabled
+              >
+                &lt;
+              </Button>
+              <Button
+                variant="default"
+                className="w-10 h-10 p-0 rounded-full bg-purple-600 hover:bg-purple-700"
+              >
+                1
+              </Button>
+              <Button variant="outline" className="w-10 h-10 p-0 rounded-full">
+                2
+              </Button>
+              <Button variant="outline" className="w-10 h-10 p-0 rounded-full">
+                3
+              </Button>
+              <Button variant="outline" className="w-10 h-10 p-0 rounded-full">
+                &gt;
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No articles found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Try adjusting your search or filter to find what you're looking
+              for.
+            </p>
+            <Button
+              className="mt-4 rounded-full"
+              onClick={() => {
+                setSelectedCategory("All");
+                setSearchQuery("");
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )} */}
+
         <div className="flex mt-5 items-center justify-between">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {(meta.current - 1) * meta.pageSize + 1} to{" "}
-            {Math.min(meta.current * meta.pageSize, meta.total)} of {meta.total} entries
+            {Math.min(meta.current * meta.pageSize, meta.total)} of {meta.total}{" "}
+            entries
           </p>
           <Pagination
             currentPage={meta.current}
@@ -330,7 +362,8 @@ const BlogMain = (props: IProps) => {
             Subscribe to Our Newsletter
           </h2>
           <p className="text-purple-100 max-w-2xl mx-auto mb-8">
-            Get the latest articles, resources, and updates delivered straight to your inbox.
+            Get the latest articles, resources, and updates delivered straight
+            to your inbox.
           </p>
           <div className="max-w-md mx-auto flex flex-col sm:flex-row gap-3">
             <Input

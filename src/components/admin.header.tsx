@@ -1,20 +1,25 @@
-'use client'
+"use client";
 
-import { Bell, Search, ShoppingCart } from "lucide-react";
+import { Bell, Link, Search, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
 
 import ai6 from "../assets/images/ai6.png";
 import Image from "next/image";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { signOut } from "next-auth/react";
-
+import { ThemeSwitcher } from "./(shadcn)/theme-switcher";
 
 const Header = (props: any) => {
-  const {session} = props;
-  
-  console.log('>>> check session header: ', session);
+  const { session } = props;
+
+  console.log(">>> check session header: ", session);
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-4 sm:px-6">
@@ -61,9 +66,11 @@ const Header = (props: any) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>{session?.user?.username ?? ""}</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => signOut({redirectTo: '/'})}>
-                  Đăng xuất
+              <DropdownMenuItem>
+                {session?.user?.username ?? ""}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut({ redirectTo: "/" })}>
+                Đăng xuất
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -71,6 +78,6 @@ const Header = (props: any) => {
       </div>
     </header>
   );
-}
+};
 
 export default Header;

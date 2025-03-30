@@ -3,10 +3,12 @@ import Footer from "@/components/layout/footer";
 import BlogMain from "@/components/blog/blogs";
 import { sendRequest } from "@/utils/api";
 import { getUsers, handleGetCustomPost } from "@/utils/action";
+import { auth } from "@/auth";
+import { Reddit_Sans } from "next/font/google";
 
 interface IProps {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 const getCategoriesForPost = async () => {
@@ -20,14 +22,53 @@ const getCategoriesForPost = async () => {
   }
 };
 
-const BlogPage = async () => {
+const BlogPage = async (props: IProps) => {
   const categories = (await getCategoriesForPost()) || [];
   // const posts = await fetchPosts();
-  const posts = await handleGetCustomPost();
+  // const posts = await handleGetCustomPost();
+
+  const searchParams = await props?.searchParams;
+  console.log(">>>searchParams: ", searchParams);
+  let current = Number(searchParams?.current) || 1;
+  const pageSize = (await Number(searchParams?.pageSize)) || 6;
+  const session = await auth();
+
+  let res = await sendRequest<IBackendRes<any>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/custom`,
+    method: "GET",
+    queryParams: {
+      current,
+      pageSize,
+    },
+    headers: {
+      Authorization: `Bearer ${session?.user?.access_token}`,
+    },
+    nextOption: {
+      next: { tags: ["list-posts"] },
+    },
+  });
+
+  if (res?.data?.results.length === 0 && current > 1) {
+    current = 1;
+    res = await sendRequest<IBackendRes<any>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/posts/custom`,
+      method: "GET",
+      queryParams: { current, pageSize },
+      headers: { Authorization: `Bearer ${session?.user?.access_token}` },
+      nextOption: { next: { tags: ["list-posts"] } },
+    });
+  }
+  console.log(">>>res: ", res);
+
   return await (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-white dark:from-purple-900 dark:to-gray-800">
       <Header />
-      <BlogMain categories={categories} posts={posts} />
+      {/* <BlogMain categories={categories} posts={posts} /> */}
+      <BlogMain
+        initialPosts={res?.data?.results ?? []}
+        initialMeta={res?.data?.meta}
+        categories={categories}
+      />
       <Footer />
     </div>
   );

@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import UserTableModal from "@/components/admin/user-table-modal";
 import UserTable from "@/components/admin/user.table";
 import { sendRequest } from "@/utils/api";
+import { useSession } from "next-auth/react";
 
 interface IProps {
     params: { id: string }
@@ -11,6 +12,7 @@ interface IProps {
 const ManageUserPage = async (props: IProps) => {
 
     const searchParams = await props?.searchParams;
+    console.log('>>>searchParams: ', searchParams);
     let current = Number(searchParams?.current) || 1;
     const pageSize = await Number(searchParams?.pageSize) || 10;
     const session = await auth();
@@ -40,6 +42,8 @@ const ManageUserPage = async (props: IProps) => {
             nextOption: { next: { tags: ['list-users'] } }
         });
     }
+
+    console.log('>>>users paginate: ', res);
 
     return (
         <div>

@@ -41,11 +41,9 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <AntdRegistry> */}
           {/* <SessionProvider> */}
             <NextAuthWrapper >{children}</NextAuthWrapper>
           {/* </SessionProvider> */}
-          {/* </AntdRegistry> */}
           <Toaster />
         </ThemeProvider>
       </body>

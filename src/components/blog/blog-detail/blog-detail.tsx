@@ -142,8 +142,6 @@ const postFake = {
 const BlogDetail = (props: any) => {
   const { slug } = props;
 
-  const categories = ["Công nghệ", "Khoa học", "Toán học"];
-
   const [post, setPost] = useState(postFake);
   const [relatedPosts, setRelatedPosts] = useState([
     {
@@ -237,6 +235,7 @@ const BlogDetail = (props: any) => {
   }, [slug]);
 
 
+
   const [comment, setComment] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState(42);
@@ -305,21 +304,6 @@ const BlogDetail = (props: any) => {
                 </Badge>
               </Link>
             ))}
-            {post.categories.map((category: any, index: any) => (
-              <Link
-                href={`/blog/category/${category
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
-                key={index}
-              >
-                <Badge
-                  variant="outline"
-                  className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors"
-                >
-                  {category}
-                </Badge>
-              </Link>
-            ))}
           </div>
 
           {/* Title */}
@@ -350,7 +334,7 @@ const BlogDetail = (props: any) => {
           <div className="mb-8 rounded-xl overflow-hidden">
             <Image
               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${post.feature_image}` || ai6}
-              width={700}
+              width={800}
               height={500}
               alt={post.title}
               className="w-3xl h-auto"
@@ -467,8 +451,8 @@ const BlogDetail = (props: any) => {
                   Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {/* {post.tags.map((tag: any, index: any) => ( */}
-                  {post.categories.map((tag: any, index: any) => (
+                  {post.tags.map((tag: any, index: any) => (
+                  // {post.categories.map((tag: any, index: any) => (
                     <Link
                       href={`/blog/tag/${tag
                         .toLowerCase()

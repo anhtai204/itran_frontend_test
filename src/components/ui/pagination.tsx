@@ -62,7 +62,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
             <Button
               variant={currentPage === pageNumber ? "default" : "outline"}
               size="icon"
-              className="dark:text-gray-950 dark:hover:bg-gray-800"
+              // className="dark:text-gray-950 dark:hover:bg-gray-800"
+              className={`dark:hover:bg-gray-800 ${
+                currentPage === pageNumber ? "dark:text-gray-950" : "dark:text-white"
+              }`}
               onClick={() => onPageChange(pageNumber as number)}
             >
               {pageNumber}

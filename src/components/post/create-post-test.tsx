@@ -1,29 +1,37 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PostEditor } from "@/components/post/post-editor";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { Globe, Lock, Users, MessageSquare, Bell } from "lucide-react";
 import {
-  CalendarIcon,
-  Globe,
-  Lock,
-  Users,
-  MessageSquare,
-  Bell,
-} from "lucide-react";
-import { FileUploadArea } from "@/components/post/file-upload-area";
-import { handleGetCategories, handleCreatePost } from "@/utils/action";
+  handleGetCategories,
+  handleCreatePost,
+  handleGetTags,
+} from "@/utils/action";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { toast } from "sonner";
+import { DateTimePicker } from "@/components/date-time-picker";
+import { PostEditor } from "./post-editor";
+import { FileUploadArea } from "./file-upload-area";
+import { generateId } from "@/utils/generatedId";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-export default function PostsPage(props: any) {
-
-  const { session} = props;
+export default function CreatePostsPage(props: any) {
+  const { session } = props;
+  const router = useRouter();
 
   // Đảm bảo tất cả các hooks được gọi ở cùng một thứ tự trong mỗi lần render
   const [title, setTitle] = useState("");
@@ -33,23 +41,53 @@ export default function PostsPage(props: any) {
     { label: string; value: string }[]
   >([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [tags, setTags] = useState<{ label: string; value: string }[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [visibility, setVisibility] = useState("public");
   const [isPublished, setIsPublished] = useState(false);
   const [allowComments, setAllowComments] = useState(true);
   const [receiveNotifications, setReceiveNotifications] = useState(true);
-  const [featuredImage, setFeaturedImage] = useState("");
-  const [tags, setTags] = useState("");
+  const [featuredImage, setFeaturedImage] = useState<File | string>("");
   const [slug, setSlug] = useState("");
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [mounted, setMounted] = useState(false);
+  const [navigateDialog, setNavigateDialogOpen] = useState(false);
   const [blocks, setBlocks] = useState<any[]>([
     {
-      id: `block-initial-${Date.now()}`,
+      id: `block-text-${generateId()}`,
       type: "text",
       content: "",
     },
   ]);
+
+  const refreshData = () => {
+    setTitle("");
+    setDescription("");
+    setExcerpt("");
+    setSelectedCategories([]);
+    setSelectedTags([]);
+    setVisibility("public");
+    setIsPublished(false);
+    setAllowComments(true);
+    setReceiveNotifications(true);
+    setFeaturedImage("");
+    setSlug("");
+    setDate(undefined);
+    setBlocks([
+      {
+        id: `block-text-${generateId()}`,
+        type: "text",
+        content: "",
+      },
+    ]);
+    // Force a re-render of the FileUploadArea by adding a key
+    const fileUploadArea = document.querySelector('[data-testid="file-upload-area"]')
+    if (fileUploadArea) {
+      // Add a unique key to force re-render
+      fileUploadArea.setAttribute("data-key", Date.now().toString())
+    }
+    setNavigateDialogOpen(false);
+  };
 
   // Xử lý client-side rendering
   useEffect(() => {
@@ -81,6 +119,31 @@ export default function PostsPage(props: any) {
     fetchCategories();
   }, []);
 
+  // Fetch tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const items = await handleGetTags();
+        if (Array.isArray(items)) {
+          // Transform the data to match the MultiSelect Option type
+          const formattedTags = items.map((item) => ({
+            label: item.label,
+            value: item.key,
+          }));
+          setTags(formattedTags);
+        } else {
+          console.error("Tags data is not an array:", items);
+          setTags([]);
+        }
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+        setTags([]);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
   // Generate slug from title
   useEffect(() => {
     if (title) {
@@ -92,59 +155,156 @@ export default function PostsPage(props: any) {
     }
   }, [title]);
 
-  const handleFeaturedImageSelect = (file: File) => {
-    console.log("Selected featured image:", file);
-    // In a real app, you would upload this file to your server/cloud storage
-  };
-
   const handleFeaturedImageUpload = (url: string) => {
     setFeaturedImage(url);
   };
 
+  const handleFeaturedImageSelect = async (file: File) => {
+    setFeaturedImage(file);
+  };
+
+  // Hàm để lấy URL hiển thị cho PostPreview
+  const getFeaturedImagePreviewUrl = () => {
+    if (featuredImage instanceof File) {
+      return URL.createObjectURL(featuredImage); // Tạo blob: URL cho preview
+    }
+    return featuredImage || ""; // Trả về string nếu đã là URL
+  };
+
+  const uploadFileToServer = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const uploadResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (!uploadResponse.ok) {
+      console.error("Upload failed with status:", uploadResponse.status);
+      console.error("Response text:", await uploadResponse.text());
+      throw new Error("Failed to upload file");
+    }
+
+    const result = await uploadResponse.json();
+    return await result.data.url;
+  };
+
   const handleSubmit = async (isDraft = false) => {
-    // Validate required fields
     if (!title) {
-      // Show error message
       toast("Title is required");
       return;
     }
 
-    // Prepare post data
-    const postData = {
-      title: title,
-      content: JSON.stringify(blocks[0].content),
-      description,
-      excerpt: excerpt || description,
-      post_status: isDraft ? "draft" : isPublished ? "published" : "draft",
-      slug,
-      categories_id: selectedCategories, // This will be an array of category IDs
-      author_id: session?.user?.id,
-      // featured_image: featuredImage,
-      visibility: visibility,
-      comment_status: allowComments,
-      ping_status: receiveNotifications,
-      // tags: tags
-      //   .split(",")
-      //   .map((tag) => tag.trim())
-      //   .filter(Boolean),
-      created_at: isPublished ? new Date().toISOString() : null,
-    };
-
-    console.log('>>postData: ', postData);
-
     try {
-      const response = await handleCreatePost(postData)
+      // Process blocks for saving
+      const processedBlocks = await Promise.all(
+        blocks.map(async (block) => {
+          // Đảm bảo mỗi block có ID duy nhất
+          const blockId = block.id || `block-${block.type}-${generateId()}`;
+
+          // If block content is a File, upload it first
+          if (block.content instanceof File) {
+            const formData = new FormData();
+            formData.append("file", block.content);
+
+            try {
+              const uploadResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload`,
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              );
+
+              if (!uploadResponse.ok) {
+                throw new Error("Failed to upload file");
+              }
+
+              const result = await uploadResponse.json();
+              return {
+                ...block,
+                id: blockId,
+                content: `${process.env.NEXT_PUBLIC_BACKEND_URL}/${result.data.url}`,
+              };
+            } catch (error) {
+              console.error("Error uploading file:", error);
+              return { ...block, id: blockId };
+            }
+          }
+          return { ...block, id: blockId };
+        })
+      );
+
+      console.log("Processed Blocks:", processedBlocks);
+
+      // Generate HTML content for backward compatibility
+      const htmlContent = processedBlocks
+        .map((block) => {
+          switch (block.type) {
+            case "text":
+              return `<div data-block-id="${block.id}">${block.content}</div>`;
+            case "list":
+              return `<div data-block-id="${block.id}">${block.content}</div>`;
+            case "image":
+              return `<figure data-block-id="${block.id}"><img src="${block.content}" alt="Image" /></figure>`;
+            case "video":
+              return `<video data-block-id="${block.id}" controls src="${block.content}"></video>`;
+            case "code":
+              return `<pre data-block-id="${block.id}"><code>${block.content}</code></pre>`;
+            default:
+              return `<div data-block-id="${block.id}">${block.content}</div>`;
+          }
+        })
+        .join("\n");
+
+      let uploadedFeaturedImageUrl =
+        typeof featuredImage === "string" ? featuredImage : "";
+      if (featuredImage instanceof File) {
+        uploadedFeaturedImageUrl = await uploadFileToServer(featuredImage);
+        setFeaturedImage(uploadedFeaturedImageUrl);
+      }
+
+      const postData = {
+        title,
+        content: htmlContent,
+        blocks_data: processedBlocks, // Store blocks as JSON for future editing
+        description: description,
+        excerpt: excerpt || description,
+        post_status: isDraft ? "draft" : isPublished ? "published" : "draft",
+        slug,
+        categories_id: selectedCategories,
+        author_id: session?.user?.id,
+        feature_image: uploadedFeaturedImageUrl || null,
+        visibility,
+        comment_status: allowComments,
+        ping_status: receiveNotifications,
+        create_at: new Date().toISOString(),
+        tags_id: selectedTags,
+        scheduled_at: date,
+      };
+
+      console.log("blocks_data value:", postData.blocks_data);
+      console.log("type of blocks_data: ", typeof postData.blocks_data);
+      console.log(">>>postData: ", postData);
+
+      const response = await handleCreatePost(postData);
+
       if (response.statusCode === 201) {
-        // Show success message and redirect
-        console.log("Post created successfully:", response.data)
         toast("Post created successfully!");
-        // Redirect to post list or view
+        setNavigateDialogOpen(true);
+        // router.push("/dashboard/post/all-posts");
+      } else if (response.statusCode === 409) {
+        toast("A post with this slug already exists");
       } else {
-        // Show error message
-        toast("Post already exist or failed to create");
+        toast(`Failed to create post: ${response.message}`);
       }
     } catch (error) {
-      console.error("Error creating post:", error)
+      console.error("Error creating post:", error);
+      toast("Failed to create post");
     }
   };
 
@@ -153,21 +313,6 @@ export default function PostsPage(props: any) {
     return <div className="p-6">Loading post editor...</div>;
   }
 
-  // const showContent = () => {
-  //   console.log(">>>title: ", title);
-  //   console.log(">>>description: ", description);
-  //   console.log(">>>excerpt: ", excerpt);
-  //   console.log(">>>visibility: ", visibility);
-  //   console.log(">>>isPublished: ", isPublished);
-  //   console.log(">>>allowComments: ", allowComments);
-  //   console.log(">>>receiveNotifications: ", receiveNotifications);
-  //   console.log(">>>tags: ", tags);
-  //   console.log(">>>slug: ", slug);
-  //   console.log(">>>date: ", date);
-  //   console.log(">>>featured_image: ", featuredImage);
-  //   console.log(">>>block: ", blocks[0].content);
-  // };
-
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 lg:ml-20">
@@ -175,12 +320,11 @@ export default function PostsPage(props: any) {
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">Create New Post</h1>
             <div className="flex items-center gap-4">
-              <Button variant="outline" className="dark:text-white" onClick={() => handleSubmit(true)}>
-              {/* <Button
+              <Button
                 variant="outline"
                 className="dark:text-white"
-                onClick={() => showContent()}
-              > */}
+                onClick={() => handleSubmit(true)}
+              >
                 Save Draft
               </Button>
               <Button onClick={() => handleSubmit(false)}>Publish</Button>
@@ -243,7 +387,7 @@ export default function PostsPage(props: any) {
                     title={title}
                     description={description}
                     excerpt={excerpt}
-                    featuredImage={featuredImage}
+                    featuredImage={getFeaturedImagePreviewUrl()}
                     allowComments={allowComments}
                     receiveNotifications={receiveNotifications}
                     blocks={blocks}
@@ -348,23 +492,7 @@ export default function PostsPage(props: any) {
 
                   <div className="space-y-2">
                     <Label>Schedule</Label>
-                    <div className="relative">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                        onClick={() => setShowCalendar(!showCalendar)}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        <span>
-                          {date ? date.toDateString() : "Pick a date"}
-                        </span>
-                      </Button>
-                      {showCalendar && (
-                        <div className="absolute z-10 mt-2">
-                          {/* Calendar component would go here */}
-                        </div>
-                      )}
-                    </div>
+                    <DateTimePicker date={date} setDate={setDate} />
                   </div>
                 </CardContent>
               </Card>
@@ -374,15 +502,17 @@ export default function PostsPage(props: any) {
                   <CardTitle>Tags</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Input
-                    placeholder="Add tags separated by commas"
-                    value={tags}
-                    onChange={(e) => setTags(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Tags help users find your content. Separate multiple tags
-                    with commas.
-                  </p>
+                  <div className="space-y-2">
+                    <MultiSelect
+                      options={tags}
+                      selected={selectedTags}
+                      onChange={setSelectedTags}
+                      placeholder="Select tags"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Select one or more tags for your post.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -412,11 +542,45 @@ export default function PostsPage(props: any) {
                   <FileUploadArea
                     onFileSelect={handleFeaturedImageSelect}
                     onFileUpload={handleFeaturedImageUpload}
-                    value={featuredImage}
+                    value={
+                      typeof featuredImage === "string" ? featuredImage : ""
+                    }
                   />
                 </CardContent>
               </Card>
             </div>
+
+            {/* Navigation Confirmation Dialog */}
+            <Dialog open={navigateDialog} onOpenChange={setNavigateDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    Do you want to navigate to the page to view the entire
+                    posts?
+                  </DialogTitle>
+                  <DialogDescription>
+                    This action will navigate to the all post page.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={refreshData}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      router.push("/dashboard/post/all-posts");
+                      setNavigateDialogOpen(false);
+                    }}
+                  >
+                    Navigate
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </main>
       </div>

@@ -31,17 +31,17 @@ import ai7 from "../assets/images/ai7.png";
 import ai8 from "../assets/images/ai8.webp";
 import ai9 from "../assets/images/ai9.webp";
 
-import { ThemeSwitcher } from "@/components/(shadcn)/theme-switcher";
 import { ImageSlider } from "@/components/(shadcn)/image-slider";
-import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { useSession } from "next-auth/react";
+import HeaderNotLogin from "@/components/layout/header";
 
 export default function Home(props: any) {
   const images = [ai1, ai2, ai3, ai4, ai5, ai6, ai7, ai8, ai9, ani, ai, doof, earth, hnue, meme];
 
   return (
     <div className="flex min-h-screen flex-col dark:bg-gray-900 dark:text-gray-100">
-      <Header /> 
+      <HeaderNotLogin />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-b from-purple-100 to-white dark:from-purple-900 dark:to-gray-800 pt-16 pb-18">

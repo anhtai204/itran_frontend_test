@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2 } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +31,7 @@ import {
   handleGetCategories,
   handleCreateCategory,
   handleDeleteCategory,
+  handleUpdateCategory,
 } from "@/utils/action";
 
 // Data structure
@@ -54,6 +55,9 @@ export default function CategoriesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Fetch categories from the database
   useEffect(() => {
@@ -111,7 +115,14 @@ export default function CategoriesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isEditing && editingCategory) {
+      handleUpdate();
+    } else {
+      handleCreate();
+    }
+  };
 
+  const handleCreate = async () => {
     // Check if category with same name already exists
     const nameExists = categories.some(
       (cat) => cat.name.toLowerCase() === formData.name.toLowerCase()
@@ -170,6 +181,113 @@ export default function CategoriesPage() {
     } catch (error) {
       console.error("Error creating category:", error);
       toast("Lỗi khi thêm danh mục");
+    }
+  };
+
+  // edit
+  const handleUpdate = async () => {
+    if (!editingCategory) return;
+
+    // Check if any other category has the same name
+    const nameExists = categories.some(
+      (cat) =>
+        cat.id !== editingCategory &&
+        cat.name.toLowerCase() === formData.name.toLowerCase()
+    );
+
+    // Check if any other category has the same slug
+    const slugExists = categories.some(
+      (cat) => cat.id !== editingCategory && cat.slug === formData.slug
+    );
+
+    if (nameExists) {
+      toast("Danh mục với tên này đã tồn tại");
+      return;
+    }
+
+    if (slugExists) {
+      toast("Danh mục với đường dẫn này đã tồn tại");
+      return;
+    }
+
+    // Prevent setting a category as its own parent
+    if (formData.parent_id === editingCategory) {
+      toast("Danh mục không thể là danh mục cha của chính nó");
+      return;
+    }
+
+    // Check if the new parent is a descendant of this category (to prevent circular references)
+    if (formData.parent_id && formData.parent_id !== "none") {
+      let currentParentId = formData.parent_id;
+      let isCircular = false;
+
+      // Check up the hierarchy to see if we encounter the category being edited
+      while (currentParentId) {
+        const parent = categories.find((cat) => cat.id === currentParentId);
+        if (!parent || !parent.parent_id) break;
+
+        if (parent.parent_id === editingCategory) {
+          isCircular = true;
+          break;
+        }
+
+        currentParentId = parent.parent_id;
+      }
+
+      if (isCircular) {
+        toast("Không thể chọn danh mục con làm danh mục cha (tạo vòng lặp)");
+        return;
+      }
+    }
+
+    try {
+      const { name, description, slug, parent_id } = formData;
+      const response = await handleUpdateCategory(editingCategory, {
+        name: name,
+        description: description,
+        slug: slug,
+        parent_id: parent_id === "none" ? "" : parent_id,
+      });
+
+      console.log('>>>formData: ', formData);
+      console.log('>>>response: ', response);
+
+      if (response.statusCode === 200) {
+        try {
+          setIsLoading(true);
+          const items = await handleGetCategories();
+
+          console.log(">>>categories: ", items);
+
+          if (Array.isArray(items)) {
+            // Transform the data to match our Category type
+            const formattedCategories = items.map((item) => ({
+              id: item.key,
+              name: item.label,
+              description: item.description || "", // The API might not return this
+              slug: item.slug || "", // The API might not return this
+              parent_id: item.parent_id || "", // Single parent ID
+            }));
+            setCategories(formattedCategories);
+          } else {
+            console.error("Categories data is not an array:", items);
+            setCategories([]);
+          }
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+          toast("Lỗi khi tải danh mục");
+        } finally {
+          setIsLoading(false);
+        }
+
+        resetForm();
+        toast("Danh mục đã được cập nhật thành công");
+      } else {
+        toast("Lỗi khi cập nhật danh mục: " + response.message);
+      }
+    } catch (error) {
+      console.error("Error updating category:", error);
+      toast("Lỗi khi cập nhật danh mục");
     }
   };
 
@@ -240,6 +358,29 @@ export default function CategoriesPage() {
       .forEach((rootCat) => addCategoryWithLevel(rootCat, 0));
 
     return result;
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      description: "",
+      slug: "",
+      parent_id: "",
+    });
+    setEditingCategory(null);
+    setIsEditing(false);
+  };
+
+  // Handle edit category
+  const handleEditClick = (category: Category) => {
+    setEditingCategory(category.id);
+    setIsEditing(true);
+    setFormData({
+      name: category.name.trim(),
+      description: category.description.trim(),
+      slug: category.slug.trim(),
+      parent_id: category.parent_id || "none",
+    });
   };
 
   const organizedCategories = organizeCategories(categories);
@@ -323,7 +464,16 @@ export default function CategoriesPage() {
               </p>
             </div>
 
-            <Button type="submit">Thêm danh mục</Button>
+            <div className="flex gap-2">
+              <Button type="submit">
+                {isEditing ? "Cập nhật danh mục" : "Thêm danh mục"}
+              </Button>
+              {isEditing && (
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  Hủy
+                </Button>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>
@@ -355,14 +505,32 @@ export default function CategoriesPage() {
                       </span>
                       <span>{category.name}</span>
                     </div>
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeleteClick(category.id)}
                       className="h-8 w-8"
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
+                    </Button> */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditClick(category)}
+                        className="h-8 w-8"
+                      >
+                        <Edit2 className="h-4 w-4 text-blue-500" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteClick(category.id)}
+                        className="h-8 w-8"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
                   </div>
                 ))
               ) : (

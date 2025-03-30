@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { ThemeSwitcher } from "../(shadcn)/theme-switcher";
 
-const Header = () => {
+const HeaderNotLogin = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-800 dark:border-gray-700">
       <div className="container flex h-16 items-center justify-between">
@@ -64,4 +64,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderNotLogin;
