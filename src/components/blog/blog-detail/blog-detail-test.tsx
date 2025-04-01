@@ -142,7 +142,7 @@ const commentFake = [
   {
     id: 1,
     author: "Michael Johnson",
-    avatar: ai1,
+    // avatar: ai1,
     date: "2023-06-16",
     content:
       "Great article! I've been using Moodle for years and it's been a game-changer for our university.",
@@ -162,7 +162,7 @@ const commentFake = [
   {
     id: 2,
     author: "Sarah Williams",
-    avatar: ai2,
+    // avatar: ai2,
     date: "2023-06-17",
     content:
       "I've been considering implementing an LMS for our company's training program. This article was very helpful in understanding the options available.",
@@ -233,7 +233,7 @@ const BlogDetail = (props: any) => {
 
             if (res.statusCode === 200) {
               console.log("post comments:", res); // Log the content specifically
-              // setPost(res.data);
+              // setComments(res.data)
             } else {
               console.error("API error:", res);
             }

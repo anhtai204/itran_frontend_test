@@ -66,8 +66,9 @@ export function BlogCard({ post }: BlogCardProps) {
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
             <div className="flex items-center space-x-2 min-w-0">
               <Image
-                src={post.authorAvatar || ai7}
-                alt={post.author}
+                // src={post.authorAvatar || ai7}
+                src={ai7}
+                alt={post.author + ""}
                 className="w-6 h-6 rounded-full mr-2"
               />
               <span className="max-w-[60px] text-xs truncate whitespace-nowrap overflow-hidden text-gray-700 dark:text-gray-300">

@@ -31,6 +31,7 @@ import {
   handleUpdatePost,
 } from "@/utils/action";
 import { generateId } from "@/utils/generatedId";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 
 // Define the Post type
 interface Post {
@@ -112,6 +113,7 @@ export default function EditPostPage() {
   const [receiveNotifications, setReceiveNotifications] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState("edit");
+  const [backDialogOpen, setBackDialogOpen] = useState(false)
 
   // generate slug
   useEffect(() => {
@@ -252,7 +254,7 @@ export default function EditPostPage() {
     if (featuredImage instanceof File) {
       return URL.createObjectURL(featuredImage); // Tạo blob: URL cho preview
     }
-    return `${process.env.NEXT_PUBLIC_BACKEND_URL}/${featuredImage}`|| ""; // Trả về string nếu đã là URL
+    return `${process.env.NEXT_PUBLIC_BACKEND_URL}/${featuredImage}` || ""; // Trả về string nếu đã là URL
   };
 
   const handleSave = async () => {
@@ -410,9 +412,35 @@ export default function EditPostPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => router.back()}>
+          {/* <Button variant="outline" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button> */}
+          <Button variant="outline" size="icon" onClick={()=>setBackDialogOpen(true)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
+          <Dialog open={backDialogOpen} onOpenChange={setBackDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Are you sure you want to back ?
+                </DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. The data has not been saved, if you navigate the data will not be recoverable.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setBackDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button variant="default" onClick={() => router.back()}>
+                  Back
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <h1 className="text-3xl font-bold">Edit Post</h1>
         </div>
         <div className="flex items-center gap-4">
@@ -654,7 +682,11 @@ export default function EditPostPage() {
               <FileUploadArea
                 onFileSelect={handleFeaturedImageSelect}
                 onFileUpload={handleFeaturedImageUpload}
-                value={typeof featuredImage === "string" ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${featuredImage}` : ""}
+                value={
+                  typeof featuredImage === "string"
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${featuredImage}`
+                    : ""
+                }
               />
             </CardContent>
           </Card>
