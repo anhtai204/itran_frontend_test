@@ -55,7 +55,7 @@ export function BlogCard({ post }: BlogCardProps) {
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
             <div className="flex items-center">
               <img
-                src={post.authorAvatar || "/placeholder.svg"}
+                src={post.authorAvatar || "/assets/images/not_found.jpg"}
                 alt={post.author}
                 className="w-6 h-6 rounded-full mr-2"
               />

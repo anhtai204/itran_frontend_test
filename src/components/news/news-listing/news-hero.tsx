@@ -80,7 +80,7 @@ export function NewsHero() {
           <Link href={`/news/${featuredNews.slug}`} className="block">
             <div className="relative h-[400px] rounded-xl overflow-hidden">
               <Image
-                src={featuredNews.image || "/placeholder.svg"}
+                src={featuredNews.image || "/assets/images/not_found.jpg"}
                 alt={featuredNews.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -118,7 +118,7 @@ export function NewsHero() {
               <div className="flex gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
                 <div className="relative h-20 w-20 flex-shrink-0 rounded-md overflow-hidden">
                   <Image
-                    src={news.image || "/placeholder.svg"}
+                    src={news.image || "/assets/images/not_found.jpg"}
                     alt={news.title}
                     fill
                     className="object-cover"

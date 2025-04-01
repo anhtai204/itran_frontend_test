@@ -28,7 +28,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html style={{ height: "100%" }} lang="en" suppressHydrationWarning>
       <body
@@ -42,9 +41,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {/* <AntdRegistry> */}
-          <SessionProvider>
-            <NextAuthWrapper >{children}</NextAuthWrapper>
-          </SessionProvider>
+          {/* <SessionProvider> */}
+          <NextAuthWrapper>{children}</NextAuthWrapper>
+          {/* </SessionProvider> */}
           {/* </AntdRegistry> */}
           <Toaster />
         </ThemeProvider>

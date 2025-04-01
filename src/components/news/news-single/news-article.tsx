@@ -186,7 +186,7 @@ export function NewsArticle({ slug }: NewsArticleProps) {
             <div className="flex items-center">
               <div className="relative h-10 w-10 rounded-full overflow-hidden mr-3">
                 <Image
-                  src={article.author.avatar || "/placeholder.svg"}
+                  src={article.author.avatar || "/assets/images/not_found.jpg"}
                   alt={article.author.name}
                   fill
                   className="object-cover"
@@ -217,7 +217,7 @@ export function NewsArticle({ slug }: NewsArticleProps) {
           {/* Featured image */}
           <div className="relative h-[400px] w-full rounded-xl overflow-hidden mb-8">
             <Image
-              src={article.image || "/placeholder.svg"}
+              src={article.image || "/assets/images/not_found.jpg"}
               alt={article.title}
               fill
               className="object-cover"
@@ -306,7 +306,7 @@ export function NewsArticle({ slug }: NewsArticleProps) {
                   <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <div className="relative h-40 w-full">
                       <Image
-                        src={news.image || "/placeholder.svg"}
+                        src={news.image || "/assets/images/not_found.jpg"}
                         alt={news.title}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"

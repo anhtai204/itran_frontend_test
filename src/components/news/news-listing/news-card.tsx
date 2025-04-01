@@ -24,7 +24,7 @@ export function NewsCard({ news }: NewsCardProps) {
       <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="relative h-48 w-full">
           <Image
-            src={news.image || "/placeholder.svg"}
+            src={news.image || "/assets/images/not_found.jpg"}
             alt={news.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"

@@ -4,7 +4,7 @@ import { ThemeSwitcher } from "../(shadcn)/theme-switcher";
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-800 dark:border-gray-700">
+    <header className="min-w-max top-0 z-50 w-full border-b bg-white dark:bg-gray-800 dark:border-gray-700">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center">
@@ -20,10 +20,10 @@ const Header = () => {
               Home
             </Link>
             <Link
-              href="/course"
+              href="/courses"
               className="text-sm font-medium dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
-              Course
+              Courses
             </Link>
 
             <Link
